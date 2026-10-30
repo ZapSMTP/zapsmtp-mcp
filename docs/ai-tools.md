@@ -126,10 +126,10 @@ All of them are rebuilt with the docs, so they never fall behind the pages you r
 ```
 npm install -g zapsmtp-cli
 zapsmtp login                       # checks the key, keeps it readable by you only
-zapsmtp test                        # an email to the simulator, then its events
+zapsmtp test --from hello@acme.com  # an email to the simulator and the event it will raise
 zapsmtp send --from "Acme <hello@acme.com>" --to jane@example.org \
   --subject "Your receipt" --html-file receipt.html --attach ./invoice.pdf
-zapsmtp emails list --status bounced --all --json | jq '.[].to'
+zapsmtp emails list --status bounced --all --json | jq '.data[].to'
 zapsmtp domains verify <domain-id>
 ```
 

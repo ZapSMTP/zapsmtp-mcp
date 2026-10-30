@@ -248,6 +248,7 @@ const event = verifyWebhook(rawBody, req.headers, process.env.ZAP_WEBHOOK_SECRET
 Python:
 
 ```python
+import os
 from zapsmtp import verify_webhook
 
 event = verify_webhook(request.get_data(), request.headers, os.environ["ZAP_WEBHOOK_SECRET"])
@@ -279,6 +280,9 @@ event = ZapSMTP::Webhook.verify(request.raw_post, request.headers, ENV.fetch("ZA
 Java:
 
 ```java
+import com.zapsmtp.WebhookEvent;
+import com.zapsmtp.Webhooks;
+
 WebhookEvent event = Webhooks.verify(rawBody, headers, System.getenv("ZAP_WEBHOOK_SECRET"));
 ```
 
@@ -286,7 +290,8 @@ WebhookEvent event = Webhooks.verify(rawBody, headers, System.getenv("ZAP_WEBHOO
 
 ```csharp
 var body = await new StreamReader(Request.Body).ReadToEndAsync();
-var evt = Webhooks.Verify(body, Request.Headers["Zap-Signature"].ToString(), secret);
+var evt = Webhooks.Verify(body, Request.Headers["Zap-Signature"].ToString(),
+    Environment.GetEnvironmentVariable("ZAP_WEBHOOK_SECRET"));
 ```
 
 ## Laravel and Rails
