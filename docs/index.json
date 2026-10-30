@@ -1,0 +1,240 @@
+[
+ {
+  "uri": "https://zapsmtp.com/llms.txt",
+  "name": "llms.txt",
+  "title": "ZapSMTP",
+  "description": "Email API and SMTP relay: send, receive and track email.",
+  "file": "llms.txt"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/actions.md",
+  "name": "actions",
+  "title": "Click actions API",
+  "description": "Named buttons and links: tell clicks apart, describe them and see their activity.",
+  "file": "actions.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/ai-tools.md",
+  "name": "ai-tools",
+  "title": "AI tools",
+  "description": "Use ZapSMTP from AI coding assistants: the MCP server for Claude, Cursor and VS Code, Agent Skills, llms.txt with every page as Markdown, and the CLI.",
+  "file": "ai-tools.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/analytics.md",
+  "name": "analytics",
+  "title": "Tracking and analytics",
+  "description": "Follow every ZapSMTP email from acceptance to click: statuses, open and click tracking, timelines, metrics by domain, tag or provider, and alerts.",
+  "file": "analytics.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/click-actions.md",
+  "name": "click-actions",
+  "title": "Click actions",
+  "description": "Name the buttons and links in ZapSMTP emails: tell clicks apart with data-zap-action, receive email.clicked with the action, send each action to its own webhook endpoint.",
+  "file": "click-actions.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/conventions.md",
+  "name": "conventions",
+  "title": "Errors, limits and paging",
+  "description": "ZapSMTP API conventions: API keys, error format and codes, rate limits, quotas, idempotency and pagination.",
+  "file": "conventions.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/dashboard.md",
+  "name": "dashboard",
+  "title": "Dashboard tour",
+  "description": "A tour of the ZapSMTP dashboard: sending health, every email with its delivery timeline, domains, API keys, webhooks, inbound email and suppressions.",
+  "file": "dashboard.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/deliverability.md",
+  "name": "deliverability",
+  "title": "Deliverability guide",
+  "description": "Reach the inbox with ZapSMTP: Gmail, Yahoo and Microsoft sender rules, DKIM and DMARC, one-click unsubscribe, warm-up, suppressions and monitoring.",
+  "file": "deliverability.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/domain-setup.md",
+  "name": "domain-setup",
+  "title": "Domains & DNS setup",
+  "description": "Publish DKIM, SPF and DMARC for ZapSMTP at any DNS provider, verify the domain, roll out DMARC and add your logo in the inbox.",
+  "file": "domain-setup.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/domains.md",
+  "name": "domains",
+  "title": "Domains API",
+  "description": "Add and verify sending domains; tracking, reply tracking, brand and reputation.",
+  "file": "domains.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/emails.md",
+  "name": "emails",
+  "title": "Emails API",
+  "description": "Send, schedule, batch and inspect email through the ZapSMTP API.",
+  "file": "emails.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/inbound-guide.md",
+  "name": "inbound-guide",
+  "title": "Receiving email",
+  "description": "Receive email with ZapSMTP: managed or own-domain addresses, routes, signed webhooks, parsed replies, attachments, conversations and replies.",
+  "file": "inbound-guide.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/inbound.md",
+  "name": "inbound",
+  "title": "Inbound setup API",
+  "description": "Inbound addresses on managed or own domains, routing rules and stats.",
+  "file": "inbound.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/index.md",
+  "name": "index",
+  "title": "Documentation",
+  "description": "Send your first email with the ZapSMTP API in minutes: keys, live code examples in eight languages, test mode and the full API reference.",
+  "file": "index.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/keys.md",
+  "name": "keys",
+  "title": "API keys & SMTP credentials API",
+  "description": "Create and revoke API keys and per-application SMTP credentials.",
+  "file": "keys.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/logs.md",
+  "name": "logs",
+  "title": "Logs & usage API",
+  "description": "Every API request with its bodies, and this month’s usage against your plan.",
+  "file": "logs.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/migration.md",
+  "name": "migration",
+  "title": "Migrating to ZapSMTP",
+  "description": "Move from Resend, SendGrid, Mailgun, Postmark or Amazon SES: field and event mappings, templates, webhooks, suppressions, DNS and a safe rollout.",
+  "file": "migration.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/platform.md",
+  "name": "platform",
+  "title": "Simulator & dedicated IPs API",
+  "description": "Simulator addresses for testing and your dedicated sending IPs.",
+  "file": "platform.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/receiving.md",
+  "name": "receiving",
+  "title": "Received emails API",
+  "description": "Read inbound email: bodies, headers, authentication results and attachments.",
+  "file": "receiving.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/recipes.md",
+  "name": "recipes",
+  "title": "Recipes",
+  "description": "Copy-paste ZapSMTP recipes: password resets, receipts with PDFs, drip series, newsletters, bounce webhooks, support inbox, magic links, retries.",
+  "file": "recipes.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/sdks.md",
+  "name": "sdks",
+  "title": "SDKs and OpenAPI",
+  "description": "Official ZapSMTP libraries for Node.js, Python, PHP, Laravel, Go, Ruby, Java and .NET, and the OpenAPI 3.1 description of the whole API.",
+  "file": "sdks.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/sending.md",
+  "name": "sending",
+  "title": "Sending email",
+  "description": "Send email with the ZapSMTP API: addresses, HTML and text, attachments, headers, tags, idempotency, scheduling, batches, streams and retries.",
+  "file": "sending.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/smtp.md",
+  "name": "smtp",
+  "title": "SMTP relay",
+  "description": "Connect any mailer to ZapSMTP over SMTP: host, ports, TLS, credentials and examples for Node.js, Python, PHP, Go, Ruby, Laravel and Django.",
+  "file": "smtp.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/stats.md",
+  "name": "stats",
+  "title": "Statistics API",
+  "description": "Delivery totals, time series, provider / bounce breakdowns and metrics by domain, stream or tag.",
+  "file": "stats.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/suppressions.md",
+  "name": "suppressions",
+  "title": "Suppressions API",
+  "description": "Addresses ZapSMTP will not send to: hard bounces, complaints, unsubscribes.",
+  "file": "suppressions.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/teams.md",
+  "name": "teams",
+  "title": "Teams and client accounts",
+  "description": "Work on many ZapSMTP accounts with one login: client accounts for agencies, invites, roles and access that ends the moment someone is removed.",
+  "file": "teams.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/template-editor.md",
+  "name": "template-editor",
+  "title": "Email template editor",
+  "description": "Design emails in the ZapSMTP visual editor or write the HTML yourself: a gallery of ready templates, drag-and-drop blocks, live preview, versions, and sending by template id.",
+  "file": "template-editor.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/template-library.md",
+  "name": "template-library",
+  "title": "Modules, images & timers API",
+  "description": "Saved modules, template images and countdown timers for the visual template editor.",
+  "file": "template-library.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/templates.md",
+  "name": "templates",
+  "title": "Templates API",
+  "description": "Store email templates with Mustache variables and render previews.",
+  "file": "templates.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/templating.md",
+  "name": "templating",
+  "title": "Templates and variables",
+  "description": "ZapSMTP template language: escaping, sections, lists, typed variables with defaults, global variables, previews, publishing, versions and sending by template id or alias.",
+  "file": "templating.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/testing.md",
+  "name": "testing",
+  "title": "Testing and simulator",
+  "description": "Test every delivery path with ZapSMTP test keys and simulator addresses: bounces, complaints, delays and exact SMTP replies.",
+  "file": "testing.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/variables.md",
+  "name": "variables",
+  "title": "Variables API",
+  "description": "The variable catalogue and the account’s global variables ({{global.key}}).",
+  "file": "variables.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/webhook-events.md",
+  "name": "webhook-events",
+  "title": "Webhook events",
+  "description": "ZapSMTP webhook event types, payloads, retries and HMAC-SHA256 signature verification with code for Node.js, Python, PHP, Go and Ruby.",
+  "file": "webhook-events.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/webhooks.md",
+  "name": "webhooks",
+  "title": "Webhooks API",
+  "description": "Receive signed delivery events, inspect attempts, replay and rotate secrets.",
+  "file": "webhooks.md"
+ }
+]

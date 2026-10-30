@@ -1,0 +1,176 @@
+# ZapSMTP
+
+> Email API and SMTP relay: send, receive and track email.
+
+- Base URL: `https://api.zapsmtp.com/v1`. Authenticate with `Authorization: Bearer <API key>`; JSON in and out.
+- Test keys (`zap_test_…`) run the whole pipeline without delivering anything; send to `delivered@simulator.zapsmtp.com` (and the other [simulator addresses](https://zapsmtp.com/docs/testing.md)) to see each outcome.
+- SDKs for Node.js, Python, PHP (and Laravel), Go, Ruby (and Rails), Java and .NET: https://zapsmtp.com/docs/sdks.md
+- Keep API keys on the server. Sends take an `Idempotency-Key`; retry 429 and 5xx answers with backoff, honouring `Retry-After`.
+- Errors: `{"statusCode", "name", "message", "error": {"code", "message", "type"}}`. OpenAPI 3.1: https://zapsmtp.com/openapi.json
+- Every page below is Markdown; all of them in one file: https://zapsmtp.com/llms-full.txt
+
+## Get started
+
+- [Quickstart](https://zapsmtp.com/docs/index.md): Send your first email with the ZapSMTP API in minutes: keys, live code examples in eight languages, test mode and the full API reference.
+- [Dashboard tour](https://zapsmtp.com/docs/dashboard.md): A tour of the ZapSMTP dashboard: sending health, every email with its delivery timeline, domains, API keys, webhooks, inbound email and suppressions.
+- [SDKs and OpenAPI](https://zapsmtp.com/docs/sdks.md): Official ZapSMTP libraries for Node.js, Python, PHP, Laravel, Go, Ruby, Java and .NET, and the OpenAPI 3.1 description of the whole API.
+- [AI tools](https://zapsmtp.com/docs/ai-tools.md): Use ZapSMTP from AI coding assistants: the MCP server for Claude, Cursor and VS Code, Agent Skills, llms.txt with every page as Markdown, and the CLI.
+- [Recipes](https://zapsmtp.com/docs/recipes.md): Copy-paste ZapSMTP recipes: password resets, receipts with PDFs, drip series, newsletters, bounce webhooks, support inbox, magic links, retries.
+- [Migrating to ZapSMTP](https://zapsmtp.com/docs/migration.md): Move from Resend, SendGrid, Mailgun, Postmark or Amazon SES: field and event mappings, templates, webhooks, suppressions, DNS and a safe rollout.
+
+## Sending
+
+- [Sending email](https://zapsmtp.com/docs/sending.md): Send email with the ZapSMTP API: addresses, HTML and text, attachments, headers, tags, idempotency, scheduling, batches, streams and retries.
+- [Domains & DNS setup](https://zapsmtp.com/docs/domain-setup.md): Publish DKIM, SPF and DMARC for ZapSMTP at any DNS provider, verify the domain, roll out DMARC and add your logo in the inbox.
+- [Templates and variables](https://zapsmtp.com/docs/templating.md): ZapSMTP template language: escaping, sections, lists, typed variables with defaults, global variables, previews, publishing, versions and sending by template id or alias.
+- [Email template editor](https://zapsmtp.com/docs/template-editor.md): Design emails in the ZapSMTP visual editor or write the HTML yourself: a gallery of ready templates, drag-and-drop blocks, live preview, versions, and sending by template id.
+- [SMTP relay](https://zapsmtp.com/docs/smtp.md): Connect any mailer to ZapSMTP over SMTP: host, ports, TLS, credentials and examples for Node.js, Python, PHP, Go, Ruby, Laravel and Django.
+
+## Events & data
+
+- [Webhook events](https://zapsmtp.com/docs/webhook-events.md): ZapSMTP webhook event types, payloads, retries and HMAC-SHA256 signature verification with code for Node.js, Python, PHP, Go and Ruby.
+- [Click actions](https://zapsmtp.com/docs/click-actions.md): Name the buttons and links in ZapSMTP emails: tell clicks apart with data-zap-action, receive email.clicked with the action, send each action to its own webhook endpoint.
+- [Tracking and analytics](https://zapsmtp.com/docs/analytics.md): Follow every ZapSMTP email from acceptance to click: statuses, open and click tracking, timelines, metrics by domain, tag or provider, and alerts.
+- [Receiving email](https://zapsmtp.com/docs/inbound-guide.md): Receive email with ZapSMTP: managed or own-domain addresses, routes, signed webhooks, parsed replies, attachments, conversations and replies.
+
+## Operations
+
+- [Deliverability guide](https://zapsmtp.com/docs/deliverability.md): Reach the inbox with ZapSMTP: Gmail, Yahoo and Microsoft sender rules, DKIM and DMARC, one-click unsubscribe, warm-up, suppressions and monitoring.
+- [Testing & simulator](https://zapsmtp.com/docs/testing.md): Test every delivery path with ZapSMTP test keys and simulator addresses: bounces, complaints, delays and exact SMTP replies.
+- [Errors, limits & paging](https://zapsmtp.com/docs/conventions.md): ZapSMTP API conventions: API keys, error format and codes, rate limits, quotas, idempotency and pagination.
+- [Teams & client accounts](https://zapsmtp.com/docs/teams.md): Work on many ZapSMTP accounts with one login: client accounts for agencies, invites, roles and access that ends the moment someone is removed.
+
+## API reference
+
+- [Emails](https://zapsmtp.com/docs/emails.md): Send, schedule, batch and inspect email through the ZapSMTP API.
+- [Domains](https://zapsmtp.com/docs/domains.md): Add and verify sending domains; tracking, reply tracking, brand and reputation.
+- [Webhooks](https://zapsmtp.com/docs/webhooks.md): Receive signed delivery events, inspect attempts, replay and rotate secrets.
+- [Click actions](https://zapsmtp.com/docs/actions.md): Named buttons and links: tell clicks apart, describe them and see their activity.
+- [Templates](https://zapsmtp.com/docs/templates.md): Store email templates with Mustache variables and render previews.
+- [Variables](https://zapsmtp.com/docs/variables.md): The variable catalogue and the account’s global variables ({{global.key}}).
+- [Modules, images & timers](https://zapsmtp.com/docs/template-library.md): Saved modules, template images and countdown timers for the visual template editor.
+- [Received emails](https://zapsmtp.com/docs/receiving.md): Read inbound email: bodies, headers, authentication results and attachments.
+- [Inbound setup](https://zapsmtp.com/docs/inbound.md): Inbound addresses on managed or own domains, routing rules and stats.
+- [Suppressions](https://zapsmtp.com/docs/suppressions.md): Addresses ZapSMTP will not send to: hard bounces, complaints, unsubscribes.
+- [Statistics](https://zapsmtp.com/docs/stats.md): Delivery totals, time series, provider / bounce breakdowns and metrics by domain, stream or tag.
+- [Keys & SMTP credentials](https://zapsmtp.com/docs/keys.md): Create and revoke API keys and per-application SMTP credentials.
+- [Logs & usage](https://zapsmtp.com/docs/logs.md): Every API request with its bodies, and this month’s usage against your plan.
+- [Simulator & IPs](https://zapsmtp.com/docs/platform.md): Simulator addresses for testing and your dedicated sending IPs.
+
+## Optional
+
+- [Declare an action — Click actions API](https://zapsmtp.com/docs/actions/create-action.md): Declare an action and describe it. Optional: links work with any valid name, declared or not.
+- [Delete an action — Click actions API](https://zapsmtp.com/docs/actions/delete-action.md): Delete an action’s declaration. Links that name it keep working: clicks are still tracked and still reach webhooks filtered on it.
+- [Retrieve an action — Click actions API](https://zapsmtp.com/docs/actions/get-action.md): Retrieve one action from the catalogue, with its activity and where it is used.
+- [List actions — Click actions API](https://zapsmtp.com/docs/actions/list-actions.md): List every action of the account: the ones you declared, the ones links named in the last 30 days, and the ones templates and webhook filters use. Sorted b
+- [Describe an action — Click actions API](https://zapsmtp.com/docs/actions/update-action.md): Change an action’s description. An action that links use but nobody declared is declared by this call.
+- [Check reputation now — Domains API](https://zapsmtp.com/docs/domains/check-domain-reputation.md): Run a blocklist check of the domain now and return its reputation.
+- [Add a domain — Domains API](https://zapsmtp.com/docs/domains/create-domain.md): Add a sending domain; returns the DNS records to publish.
+- [Delete a domain — Domains API](https://zapsmtp.com/docs/domains/delete-domain.md): Delete a sending domain.
+- [DMARC reports — Domains API](https://zapsmtp.com/docs/domains/domain-dmarc.md): DMARC aggregate reports about the domain: the address to publish in your DMARC record and what mailbox providers reported.
+- [Domain reputation — Domains API](https://zapsmtp.com/docs/domains/domain-reputation.md): Blocklist (DNSBL) status of a sending domain.
+- [Retrieve brand settings — Domains API](https://zapsmtp.com/docs/domains/get-brand.md): Brand-in-the-inbox status: sender name, BIMI logo/certificate, DMARC enforcement and per-provider readiness.
+- [Retrieve a domain — Domains API](https://zapsmtp.com/docs/domains/get-domain.md): Retrieve a sending domain.
+- [List domains — Domains API](https://zapsmtp.com/docs/domains/list-domains.md): List sending domains (newest first) with their DNS records.
+- [Update brand settings — Domains API](https://zapsmtp.com/docs/domains/update-brand.md): Set the default sender name and upload/remove the BIMI logo and certificate.
+- [Update a domain — Domains API](https://zapsmtp.com/docs/domains/update-domain.md): Set the domain's tracking defaults (opens, clicks, replies) and its outbound TLS policy.
+- [Verify a domain — Domains API](https://zapsmtp.com/docs/domains/verify-domain.md): Check DKIM/SPF/DMARC DNS now and update the domain's status.
+- [Cancel a scheduled email — Emails API](https://zapsmtp.com/docs/emails/cancel-email.md): Cancel a scheduled email before it is dispatched.
+- [Retrieve email content — Emails API](https://zapsmtp.com/docs/emails/get-email-content.md): Retrieve the archived content of a sent email.
+- [Retrieve an email — Emails API](https://zapsmtp.com/docs/emails/get-email.md): Retrieve one email with per-recipient status and its event timeline.
+- [Retrieve an attachment — Emails API](https://zapsmtp.com/docs/emails/get-sent-attachment.md): One attachment of a sent email with a fresh download link.
+- [List emails — Emails API](https://zapsmtp.com/docs/emails/list-emails.md): List sent emails, newest first.
+- [List attachments — Emails API](https://zapsmtp.com/docs/emails/list-sent-attachments.md): Attachments of a sent email, each with a download link valid for one hour.
+- [Reschedule an email — Emails API](https://zapsmtp.com/docs/emails/reschedule-email.md): Reschedule a scheduled email.
+- [Send a batch — Emails API](https://zapsmtp.com/docs/emails/send-batch.md): Send 1-100 emails in one request.
+- [Send an email — Emails API](https://zapsmtp.com/docs/emails/send-email.md): Send an email (or schedule it with scheduled_at).
+- [Share an email — Emails API](https://zapsmtp.com/docs/emails/share-email.md): Create a link anyone can open to view a sent email — for a colleague or support. It shows the subject, sender, recipients and body; never attachments or he
+- [Spam-check a draft — Emails API](https://zapsmtp.com/docs/emails/spam-check-draft.md): Score a draft for spam before sending (nothing is sent or stored).
+- [Spam-check a sent email — Emails API](https://zapsmtp.com/docs/emails/spam-check-email.md): Score an already sent email (live or test) from the content archive.
+- [Add a forward destination — Inbound setup API](https://zapsmtp.com/docs/inbound/create-forward-destination.md): Add a forward destination: we email it a confirmation link; routes can forward there once its owner confirms.
+- [Add an inbound domain — Inbound setup API](https://zapsmtp.com/docs/inbound/create-inbound-domain.md): Create an inbound domain: a managed address (&lt;slug&gt;.&lt;inbound zone&gt;) or your own domain.
+- [Create a route — Inbound setup API](https://zapsmtp.com/docs/inbound/create-route.md): Create an inbound route (max 100 per account).
+- [Remove a forward destination — Inbound setup API](https://zapsmtp.com/docs/inbound/delete-forward-destination.md): Remove a forward destination; routes forwarding there only store from then on.
+- [Delete an inbound domain — Inbound setup API](https://zapsmtp.com/docs/inbound/delete-inbound-domain.md): Delete an inbound domain.
+- [Delete a route — Inbound setup API](https://zapsmtp.com/docs/inbound/delete-route.md): Delete an inbound route.
+- [Retrieve an inbound domain — Inbound setup API](https://zapsmtp.com/docs/inbound/get-inbound-domain.md): Retrieve an inbound domain.
+- [Retrieve a route — Inbound setup API](https://zapsmtp.com/docs/inbound/get-route.md): Retrieve an inbound route.
+- [Inbound stats — Inbound setup API](https://zapsmtp.com/docs/inbound/inbound-stats.md): Inbound counters for the last 24 hours.
+- [List forward destinations — Inbound setup API](https://zapsmtp.com/docs/inbound/list-forward-destinations.md): List the addresses received mail can be forwarded to.
+- [List inbound domains — Inbound setup API](https://zapsmtp.com/docs/inbound/list-inbound-domains.md): List inbound domains (oldest first).
+- [List routes — Inbound setup API](https://zapsmtp.com/docs/inbound/list-routes.md): List inbound routes in evaluation order (priority ascending, then created_at).
+- [Resend the confirmation — Inbound setup API](https://zapsmtp.com/docs/inbound/resend-forward-confirmation.md): Email a new confirmation link (the previous one stops working).
+- [Update an inbound domain — Inbound setup API](https://zapsmtp.com/docs/inbound/update-inbound-domain.md): Update an inbound domain's spam policy.
+- [Update a route — Inbound setup API](https://zapsmtp.com/docs/inbound/update-route.md): Update an inbound route (partial; same fields and validation as create).
+- [Verify MX records — Inbound setup API](https://zapsmtp.com/docs/inbound/verify-inbound-domain.md): Check the domain's MX record now.
+- [Create an API key — API keys & SMTP credentials API](https://zapsmtp.com/docs/keys/create-api-key.md): Create an API key; the full key (token) is returned only once.
+- [Create SMTP credentials — API keys & SMTP credentials API](https://zapsmtp.com/docs/keys/create-smtp-credential.md): Create an SMTP credential; the password is returned only once.
+- [List API keys — API keys & SMTP credentials API](https://zapsmtp.com/docs/keys/list-api-keys.md): List active API keys (newest first); tokens are never returned.
+- [List SMTP credentials — API keys & SMTP credentials API](https://zapsmtp.com/docs/keys/list-smtp-credentials.md): List active SMTP credentials plus the plan limit and relay settings.
+- [Revoke an API key — API keys & SMTP credentials API](https://zapsmtp.com/docs/keys/revoke-api-key.md): Revoke an API key immediately.
+- [Revoke SMTP credentials — API keys & SMTP credentials API](https://zapsmtp.com/docs/keys/revoke-smtp-credential.md): Revoke an SMTP credential.
+- [Update an API key — API keys & SMTP credentials API](https://zapsmtp.com/docs/keys/update-api-key.md): Rename a key or change its permission and restrictions. The token and the mode never change; the new rights apply to the next request.
+- [Retrieve a log — Logs & usage API](https://zapsmtp.com/docs/logs/get-log.md): Retrieve one request with its request and response bodies. Bodies are capped at 16 KB; API keys, passwords and signing secrets are always replaced with [re
+- [List logs — Logs & usage API](https://zapsmtp.com/docs/logs/list-logs.md): List the API requests made with your keys, newest first. Bodies are on Retrieve a log. Entries appear within seconds and are kept for your plan’s log reten
+- [Retrieve usage — Logs & usage API](https://zapsmtp.com/docs/logs/usage.md): This month’s sending against your plan: emails sent, included volume, limit, overage and, on the Free plan, today’s count.
+- [List dedicated IPs — Simulator & dedicated IPs API](https://zapsmtp.com/docs/platform/dedicated-ips.md): List the account's dedicated IPs with warm-up progress and current blocklist listings.
+- [List simulator addresses — Simulator & dedicated IPs API](https://zapsmtp.com/docs/platform/simulator.md): List the simulator addresses and the events each produces.
+- [Delete a received email — Received emails API](https://zapsmtp.com/docs/receiving/delete-received.md): Permanently erase a received email's content and metadata (GDPR erasure).
+- [Retrieve an attachment — Received emails API](https://zapsmtp.com/docs/receiving/get-received-attachment.md): Retrieve one attachment's metadata and signed download link.
+- [Retrieve a received email — Received emails API](https://zapsmtp.com/docs/receiving/get-received.md): Retrieve a received email with bodies, headers, authentication results and download links.
+- [Retrieve a conversation — Received emails API](https://zapsmtp.com/docs/receiving/get-thread.md): A conversation: its state (participants, counts, last message, awaiting_reply, unread, metadata) and its received and sent emails, oldest first.
+- [List attachments — Received emails API](https://zapsmtp.com/docs/receiving/list-received-attachments.md): List a received email's attachments with signed download links.
+- [List received emails — Received emails API](https://zapsmtp.com/docs/receiving/list-received.md): List received (inbound) emails, newest first.
+- [List conversations — Received emails API](https://zapsmtp.com/docs/receiving/list-threads.md): List conversations (threads with at least one received email), the most recently active first: a helpdesk inbox.
+- [Redeliver to webhooks — Received emails API](https://zapsmtp.com/docs/receiving/redeliver-received.md): Re-send the email.received webhook for a stored message.
+- [Reply to a received email — Received emails API](https://zapsmtp.com/docs/receiving/reply-received.md): Reply to a received email: recipients, subject, sender and threading headers default to the email's, so the answer lands in the sender's conversation.
+- [Report spam / not spam — Received emails API](https://zapsmtp.com/docs/receiving/report-received-spam.md): Report a received email as spam or not spam: your account's spam filter learns from it.
+- [Mark read, set metadata — Received emails API](https://zapsmtp.com/docs/receiving/update-thread.md): Mark a conversation read or unread and set its metadata.
+- [Metrics by domain, stream, tag or provider — Statistics API](https://zapsmtp.com/docs/stats/metrics.md): Delivery and engagement of live mail by sending domain, stream, tag or mailbox provider, with rates and a time series.
+- [Breakdown — Statistics API](https://zapsmtp.com/docs/stats/stats-breakdown.md): Per-provider delivery, bounce classes, engagement and top clicked links.
+- [Time series — Statistics API](https://zapsmtp.com/docs/stats/stats-timeseries.md): Event counts by status in time buckets.
+- [Totals — Statistics API](https://zapsmtp.com/docs/stats/stats.md): Event counts by status over the last N hours (live traffic only).
+- [Add a suppression — Suppressions API](https://zapsmtp.com/docs/suppressions/add-suppression.md): Add an address to the suppression list.
+- [Add suppressions in bulk — Suppressions API](https://zapsmtp.com/docs/suppressions/add-suppressions.md): Add up to 1,000 addresses in one call. Duplicates are ignored; existing entries keep their reason (an unsubscribe becomes manual when added as manual); sen
+- [Remove a suppression — Suppressions API](https://zapsmtp.com/docs/suppressions/delete-suppression.md): Remove an address from the suppression list.
+- [Retrieve a suppression — Suppressions API](https://zapsmtp.com/docs/suppressions/get-suppression.md): Check whether one address is suppressed, and why.
+- [List suppressions — Suppressions API](https://zapsmtp.com/docs/suppressions/list-suppressions.md): List suppressed addresses, newest first, with cursor pagination.
+- [Remove suppressions in bulk — Suppressions API](https://zapsmtp.com/docs/suppressions/remove-suppressions.md): Remove up to 1,000 addresses in one call. Addresses that are not on the list are ignored.
+- [Save a module — Modules, images & timers API](https://zapsmtp.com/docs/template-library/create-template-module.md): Save rows as a module that every template of the account can insert.
+- [Create a countdown timer — Modules, images & timers API](https://zapsmtp.com/docs/template-library/create-template-timer.md): Create a countdown timer image: an animated GIF that shows the time left whenever the email is opened.
+- [Delete an image — Modules, images & timers API](https://zapsmtp.com/docs/template-library/delete-template-asset.md): Delete an image. Its URL stops working, also in emails already sent.
+- [Delete a module — Modules, images & timers API](https://zapsmtp.com/docs/template-library/delete-template-module.md): Delete a module. Templates that inserted it keep their copy.
+- [Retrieve a module — Modules, images & timers API](https://zapsmtp.com/docs/template-library/get-template-module.md): Retrieve a module.
+- [List images — Modules, images & timers API](https://zapsmtp.com/docs/template-library/list-template-assets.md): List the account’s template images, newest first.
+- [List modules — Modules, images & timers API](https://zapsmtp.com/docs/template-library/list-template-modules.md): List saved modules (reusable rows for the visual editor), most recently updated first.
+- [Update a module — Modules, images & timers API](https://zapsmtp.com/docs/template-library/update-template-module.md): Rename, recategorize or replace a module’s rows.
+- [Upload an image — Modules, images & timers API](https://zapsmtp.com/docs/template-library/upload-template-asset.md): Upload an image for use in templates, as a multipart file or by URL; returns its public URL.
+- [Create a template — Templates API](https://zapsmtp.com/docs/templates/create-template.md): Create a template (logic-less Mustache).
+- [Delete a template — Templates API](https://zapsmtp.com/docs/templates/delete-template.md): Delete a template.
+- [Duplicate a template — Templates API](https://zapsmtp.com/docs/templates/duplicate-template.md): Copy a template’s draft into a new, unpublished template named “… (copy)”, without the alias.
+- [Retrieve a version — Templates API](https://zapsmtp.com/docs/templates/get-template-version.md): Retrieve one version with its bodies and design.
+- [Retrieve a template — Templates API](https://zapsmtp.com/docs/templates/get-template.md): Retrieve a template by id or alias.
+- [List versions — Templates API](https://zapsmtp.com/docs/templates/list-template-versions.md): List a template’s saved versions, newest first.
+- [List templates — Templates API](https://zapsmtp.com/docs/templates/list-templates.md): List templates (most recently updated first).
+- [Publish a template — Templates API](https://zapsmtp.com/docs/templates/publish-template.md): Make the current draft the version sends use. Until a template is published, sending with it fails.
+- [Render unsaved source — Templates API](https://zapsmtp.com/docs/templates/render-source.md): Validate and preview unsaved template source.
+- [Render a template — Templates API](https://zapsmtp.com/docs/templates/render-template.md): Preview a stored template with given variables (defaults to its sample variables).
+- [Restore a version — Templates API](https://zapsmtp.com/docs/templates/restore-template-version.md): Copy a version back into the draft. Publishing stays a separate step.
+- [Update a template — Templates API](https://zapsmtp.com/docs/templates/update-template.md): Update a template (partial).
+- [Delete a global variable — Variables API](https://zapsmtp.com/docs/variables/delete-global-variable.md): Delete a global variable. Sends with a template that still uses it then fail with 422 template_render_error until it is set again.
+- [List variables — Variables API](https://zapsmtp.com/docs/variables/list-variables.md): The variable catalogue: every variable the account’s templates can use, with where each is used. System variables first, then global ones, then template va
+- [Set a global variable — Variables API](https://zapsmtp.com/docs/variables/put-global-variable.md): Create or replace a global variable. Every template that uses it renders the new value from the next send on.
+- [Create a webhook — Webhooks API](https://zapsmtp.com/docs/webhooks/create-webhook.md): Create a webhook endpoint; the signing secret is returned.
+- [Delete a webhook — Webhooks API](https://zapsmtp.com/docs/webhooks/delete-webhook.md): Delete a webhook endpoint.
+- [Retrieve an event — Webhooks API](https://zapsmtp.com/docs/webhooks/get-webhook-event.md): One event with its payload and every delivery attempt, oldest first.
+- [Retrieve a webhook — Webhooks API](https://zapsmtp.com/docs/webhooks/get-webhook.md): Retrieve a webhook endpoint including its signing secret.
+- [List events — Webhooks API](https://zapsmtp.com/docs/webhooks/list-webhook-events.md): Events sent to this endpoint, newest first, each with its outcome and number of attempts (from the endpoint’s last 100 delivery attempts).
+- [List webhooks — Webhooks API](https://zapsmtp.com/docs/webhooks/list-webhooks.md): List webhook endpoints (newest first); secrets are omitted.
+- [Replay an event — Webhooks API](https://zapsmtp.com/docs/webhooks/replay-event.md): Re-send a past event (from the last 100 deliveries) to the endpoint now.
+- [Rotate the signing secret — Webhooks API](https://zapsmtp.com/docs/webhooks/rotate-secret.md): Generate a new signing secret; the old one stays valid for 24 hours.
+- [Send a test event — Webhooks API](https://zapsmtp.com/docs/webhooks/test-webhook.md): Send a signed sample event to the endpoint now and report the result.
+- [Update a webhook — Webhooks API](https://zapsmtp.com/docs/webhooks/update-webhook.md): Update a webhook's URL, events, click-action filter or enabled state.
+- [List delivery attempts — Webhooks API](https://zapsmtp.com/docs/webhooks/webhook-deliveries.md): List the last 100 delivery attempts of a webhook (newest first).
+- [Pricing](https://zapsmtp.com/pricing/): plans and overage.
+- [Security](https://zapsmtp.com/security/)
+- [Changelog](https://zapsmtp.com/changelog/)

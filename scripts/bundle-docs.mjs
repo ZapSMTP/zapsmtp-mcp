@@ -32,4 +32,12 @@ for (const f of readdirSync(join(site, 'docs')).filter((f) => f.endsWith('.md'))
   add(join(site, 'docs', f), f, `https://zapsmtp.com/docs/${f}`, f.replace(/\.md$/, ''));
 }
 writeFileSync(join(out, 'index.json'), JSON.stringify(pages, null, 1) + '\n');
+// the package names production hosts only: a site built for another
+// environment (its PUBLIC_* hosts) must not end up in it
+const foreign = readdirSync(out).filter((f) => /zapsmtp\.xyz/.test(readFileSync(join(out, f), 'utf8')));
+if (foreign.length) {
+  rmSync(out, {recursive: true, force: true});
+  console.error(`docs: ${site} names zapsmtp.xyz hosts (${foreign.join(', ')}); build the site with the production PUBLIC_* hosts`);
+  process.exit(1);
+}
 console.log(`docs: bundled ${pages.length} pages`);
