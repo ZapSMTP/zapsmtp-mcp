@@ -29,7 +29,7 @@ describe('server', () => {
   it('sends the server in the User-Agent', async () => {
     const { client, requests } = fakeClient(() => [200, { object: 'usage' }]);
     await (await connect(client)).callTool({ name: 'usage_get', arguments: {} });
-    expect(requests[0].headers['user-agent']).toMatch(/^zapsmtp-mcp\/\d+\.\d+\.\d+ \(node\/[\d.]+; zapsmtp-node\/\d+\.\d+\.\d+\)$/);
+    expect(requests[0].headers['user-agent']).toMatch(/^zapsmtp-mcp\/\d+\.\d+\.\d+(-[\w.]+)? \(node\/[\d.]+; zapsmtp-node\/\d+\.\d+\.\d+(-[\w.]+)?\)$/);
   });
 
   it('turns API errors into tool errors with code, message and request id', async () => {
