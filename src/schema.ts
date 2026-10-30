@@ -5,6 +5,13 @@ export type JSONSchema = Record<string, unknown>;
 
 /** The schema of one type. Request types (refs) are inlined: tool schemas must stand alone. */
 export function typeSchema(t: Type, api: Api): JSONSchema {
+  const s = baseSchema(t, api);
+  // null clears a field (domain_id: null lifts an API key's restriction); any JSON value takes it already
+  if (t.nullable && typeof s.type === 'string') s.type = [s.type, 'null'];
+  return s;
+}
+
+function baseSchema(t: Type, api: Api): JSONSchema {
   switch (t.k) {
     case 'string': return { type: 'string' };
     case 'datetime': return { type: 'string', format: 'date-time' };
@@ -27,8 +34,8 @@ export function typeSchema(t: Type, api: Api): JSONSchema {
 export function paramSchema(p: Param, api: Api, extraDoc = ''): JSONSchema {
   const s = typeSchema(p.type, api);
   if (p.enum) {
-    if (s.type === 'array') (s.items as JSONSchema).enum = p.enum;
-    else s.enum = p.enum;
+    if (p.type.k === 'array' || p.type.k === 'strings') (s.items as JSONSchema).enum = p.enum;
+    else s.enum = p.type.nullable ? [...p.enum, null] : p.enum;
   }
   let doc = p.doc;
   if (p.type.k === 'strings') doc = joinDoc('One address or a list.', doc);
