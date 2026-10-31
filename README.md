@@ -22,8 +22,8 @@ Node.js 18.3 or newer. Built on the official [Node.js SDK](https://www.npmjs.com
 
 ## Quick start
 
-Create an API key in the [dashboard](https://zapsmtp.com) (a `zap_test_…` key runs everything without
-delivering anything), then add the server to your client.
+Create an API key in the [dashboard](https://zapsmtp.com) (a `zap_test_…` key sends test email and reads
+everything without delivering anything; changing the account needs a live key), then add the server to your client.
 
 ### Claude Code
 
