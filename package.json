@@ -4,6 +4,11 @@
   "description": "The official ZapSMTP MCP server: send, receive and track email from Claude, Cursor, VS Code, Codex and any MCP client",
   "license": "MIT",
   "homepage": "https://zapsmtp.com/docs/sdks/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZapSMTP/zapsmtp-mcp.git"
+  },
+  "bugs": "https://github.com/ZapSMTP/zapsmtp-mcp/issues",
   "keywords": ["mcp", "model context protocol", "email", "smtp", "transactional email", "zapsmtp", "ai", "agents"],
   "type": "module",
   "engines": { "node": ">=18.3" },
