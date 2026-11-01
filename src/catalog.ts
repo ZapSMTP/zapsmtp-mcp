@@ -22,6 +22,7 @@ export const TOOLSETS: Toolset[] = [
   { name: 'logs', description: 'API request logs', default: true },
   { name: 'stats', description: 'Sending statistics, time series, breakdowns and metrics', default: true },
   { name: 'usage', description: 'This month\'s usage and plan', default: true },
+  { name: 'account', description: 'The account: plan and its limits, this month\'s sent count, SMTP settings; rename it', default: true },
   { name: 'simulator', description: 'Simulator addresses, and send_test_email to try any delivery outcome safely', default: true },
   { name: 'inbound', description: 'Inbound domains, routes and forward destinations', default: false },
   { name: 'actions', description: 'Click actions (named buttons and links)', default: false },

@@ -4,7 +4,7 @@ The official [Model Context Protocol](https://modelcontextprotocol.io) server fo
 [ZapSMTP](https://zapsmtp.com): let Claude, Cursor, VS Code, Codex and any other MCP client send,
 receive and track email, and manage templates, domains, webhooks and everything else the API does.
 
-- **The whole API**: one tool per API operation (112), generated from the API reference, so a new
+- **The whole API**: one tool per API operation (114), generated from the API reference, so a new
   endpoint becomes a tool with the next release. Clear descriptions and JSON Schemas with every
   parameter, required field and allowed value.
 - **Safe to hand to an agent**: tool annotations (read-only, destructive, idempotent, open-world) for
@@ -208,7 +208,7 @@ Flags win over the environment.
 
 ## Toolsets
 
-The default toolsets give 76 tools; `--read-only` leaves 41 of them. Clients that slow down with many
+The default toolsets give 78 tools; `--read-only` leaves 42 of them. Clients that slow down with many
 tools do best with just the toolsets they need: `--toolsets emails,simulator` is 14 tools.
 
 | Toolset | Default | Tools | |
@@ -224,6 +224,7 @@ tools do best with just the toolsets they need: `--toolsets emails,simulator` is
 | `logs` | yes | 2 | `logs_list`, `logs_get` |
 | `stats` | yes | 4 | `stats_get`, `stats_timeseries`, `stats_breakdown`, `stats_metrics` |
 | `usage` | yes | 1 | `usage_get` |
+| `account` | yes | 2 | `account_get`, `account_update` |
 | `simulator` | yes | 2 | `simulator_get`, `send_test_email` |
 | `inbound` | | 16 | inbound domains, routes and forward destinations |
 | `actions` | | 5 | click actions |
