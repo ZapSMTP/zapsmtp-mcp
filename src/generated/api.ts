@@ -3035,9 +3035,20 @@ export const API: Api = {
       "email.received",
       "thread.created",
       "thread.replied",
-      "email.replied"
+      "email.replied",
+      "email.opened_unique",
+      "email.clicked_unique",
+      "email.unsubscribed",
+      "email.forward_failed",
+      "domain.verified",
+      "domain.reputation_changed",
+      "email.scheduled",
+      "suppression.added",
+      "suppression.removed",
+      "domain.created",
+      "domain.deleted"
      ],
-     "default": "all event types"
+     "default": "every type except email.opened_unique and email.clicked_unique"
     },
     {
      "name": "include_content",
@@ -3064,8 +3075,8 @@ export const API: Api = {
       "ref": "WebhookFilter"
      },
      "required": false,
-     "doc": "Narrows email.clicked to some click actions; other event types are not affected. Empty or absent: every click.",
-     "default": "{\"actions\": []}"
+     "doc": "Narrows what the endpoint receives: actions narrows email.clicked (and email.clicked_unique) to some click actions; domains narrows every event to some domains. Empty or absent: every click, every domain.",
+     "default": "{\"actions\": [], \"domains\": []}"
     }
    ],
    "options": [],
@@ -3165,7 +3176,18 @@ export const API: Api = {
       "email.received",
       "thread.created",
       "thread.replied",
-      "email.replied"
+      "email.replied",
+      "email.opened_unique",
+      "email.clicked_unique",
+      "email.unsubscribed",
+      "email.forward_failed",
+      "domain.verified",
+      "domain.reputation_changed",
+      "email.scheduled",
+      "suppression.added",
+      "suppression.removed",
+      "domain.created",
+      "domain.deleted"
      ]
     },
     {
@@ -3201,7 +3223,7 @@ export const API: Api = {
       "ref": "WebhookFilter"
      },
      "required": false,
-     "doc": "Narrows email.clicked to some click actions; other event types are not affected. Empty or absent: every click. Replaces the whole filter; {\"actions\": []} removes it."
+     "doc": "Narrows what the endpoint receives: actions narrows email.clicked (and email.clicked_unique) to some click actions; domains narrows every event to some domains. Empty or absent: every click, every domain. A list you leave out keeps its value; an empty list clears it: {\"actions\": []} lets every click through, {\"domains\": []} every domain."
     }
    ],
    "options": [],
@@ -3287,7 +3309,18 @@ export const API: Api = {
       "email.received",
       "thread.created",
       "thread.replied",
-      "email.replied"
+      "email.replied",
+      "email.opened_unique",
+      "email.clicked_unique",
+      "email.unsubscribed",
+      "email.forward_failed",
+      "domain.verified",
+      "domain.reputation_changed",
+      "email.scheduled",
+      "suppression.added",
+      "suppression.removed",
+      "domain.created",
+      "domain.deleted"
      ],
      "default": "email.delivered"
     }
@@ -5773,10 +5806,21 @@ export const API: Api = {
   },
   "WebhookFilter": {
    "name": "WebhookFilter",
-   "doc": "Narrows email.clicked to some click actions.",
+   "doc": "Narrows what an endpoint receives: email.clicked (and email.clicked_unique) to some click actions, every event to some domains.",
    "fields": [
     {
      "name": "actions",
+     "type": {
+      "k": "array",
+      "of": {
+       "k": "string"
+      }
+     },
+     "required": false,
+     "doc": ""
+    },
+    {
+     "name": "domains",
      "type": {
       "k": "array",
       "of": {

@@ -43,6 +43,7 @@ Errors use HTTP status codes and always carry both a flat shape (`statusCode`, `
 - **`restricted_api_key` (HTTP 403)**: The key has sending access only, or is limited to another domain or stream.
 - **`domain_not_verified` (HTTP 403)**: Live key sending from a domain that is not verified.
 - **`account_suspended` (HTTP 403)**: The account is suspended.
+- **`account_closing` (HTTP 403)**: The account is scheduled for deletion and sends nothing. An owner can cancel the deletion in Settings.
 - **`plan_limit_reached` (HTTP 403)**: Your plan’s limit for domains or SMTP credentials is reached.
 - **`test_key_restricted` (HTTP 403)**: A test key (`zap_test_…`) tried to change the account: test keys may send test email, render templates and read. Use a live key.
 - **`key_restricted` (HTTP 403)**: A restricted key creating or changing keys tried to give them more than it has: an expiry later than its own, or another stream.

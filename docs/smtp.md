@@ -172,7 +172,7 @@ swaks --server mail.zapsmtp.com:587 --tls \
 **SMTP replies**
 
 - **`550 5.6.0` (permanent)**: The message failed validation (for example an unparsable From, a bad header or attachment); the reply says what.
-- **`550 5.7.1` (permanent)**: The account is on the Free plan, which sends through the Email API only (`SMTP relay is not included in the Free plan`); the From domain is not verified; the credential or key is restricted to another domain or to another stream, or the account is suspended.
+- **`550 5.7.1` (permanent)**: The account is on the Free plan or a promo plan, which send through the Email API only (`SMTP relay is not included in this plan`); the From domain is not verified; the credential or key is restricted to another domain or to another stream, or the account is suspended.
 - **`550 5.1.1` (permanent)**: Every recipient is on your suppression list: nothing is sent.
 - **`535 5.7.8` (permanent)**: Authentication failed, or the credential was revoked or expired after you logged in (`Credentials no longer valid`).
 - **`451 4.7.0` (temporary)**: Over your per-second rate limit.
