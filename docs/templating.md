@@ -292,7 +292,7 @@ A preview never fails on missing variables: they render as empty text and are li
 Requires a full-access key.
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/templates/render' \
+curl -X POST 'https://app.zapsmtp.com/v1/templates/render' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -450,7 +450,7 @@ Render subject, HTML and text with variables before saving anything. Syntax erro
 Requires a full-access key.
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/templates/render' \
+curl -X POST 'https://app.zapsmtp.com/v1/templates/render' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -585,7 +585,7 @@ One template per language, same variables, aliases that share a prefix. Needs a 
 Requires a full-access live key; test keys get 403 test_key_restricted.
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/templates' \
+curl -X POST 'https://app.zapsmtp.com/v1/templates' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -665,7 +665,7 @@ curl -X POST 'https://api.zapsmtp.com/v1/templates' \
 
 ```javascript
 const alias = ['de', 'fr'].includes(user.locale) ? 'receipt-' + user.locale : 'receipt';
-await fetch('https://api.zapsmtp.com/v1/emails', {
+await fetch('https://app.zapsmtp.com/v1/emails', {
   method: 'POST',
   headers: {Authorization: 'Bearer ' + process.env.ZAP_API_KEY, 'Content-Type': 'application/json'},
   body: JSON.stringify({to: [user.email], template: {id: alias, variables}}),
@@ -689,7 +689,7 @@ Store the source with an alias, a default From, sample variables and the variabl
 Requires a full-access live key; test keys get 403 test_key_restricted.
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/templates' \
+curl -X POST 'https://app.zapsmtp.com/v1/templates' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -893,7 +893,7 @@ Requires a full-access live key; test keys get 403 test_key_restricted.
 - `id` (string, required): Template id or alias
 
 ```bash
-curl -X PATCH 'https://api.zapsmtp.com/v1/templates/receipt' \
+curl -X PATCH 'https://app.zapsmtp.com/v1/templates/receipt' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -933,7 +933,7 @@ Requires a full-access live key; test keys get 403 test_key_restricted.
 - `id` (string, required): Template id or alias.
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/templates/receipt/publish' \
+curl -X POST 'https://app.zapsmtp.com/v1/templates/receipt/publish' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -974,7 +974,7 @@ Requires a full-access key.
 - `id` (string, required): Template id or alias
 
 ```bash
-curl 'https://api.zapsmtp.com/v1/templates/receipt/versions' \
+curl 'https://app.zapsmtp.com/v1/templates/receipt/versions' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -1031,7 +1031,7 @@ Requires a full-access key.
 - `not_found` (HTTP 404): template not found / version not found
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/templates/receipt/versions/019a1f23-7f81-7192-8b3c-4d5e6f7a8b9d/restore' \
+curl -X POST 'https://app.zapsmtp.com/v1/templates/receipt/versions/019a1f23-7f81-7192-8b3c-4d5e6f7a8b9d/restore' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -1065,7 +1065,7 @@ Requires a full-access key.
 - `id` (string, required): Template id or alias
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/templates/receipt/render' \
+curl -X POST 'https://app.zapsmtp.com/v1/templates/receipt/render' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -1119,7 +1119,7 @@ Unclosed or mismatched tags are reported with the field, line and column (1-base
 Requires a full-access key.
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/templates/render' \
+curl -X POST 'https://app.zapsmtp.com/v1/templates/render' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -1198,7 +1198,7 @@ The receipt declares `customer` and `total` as required with no default. Without
 Requires a full-access or sending-access key. Live keys: From domain must be verified by the account. Test keys: any From domain, nothing delivered, monthly quota not charged.
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -1262,7 +1262,7 @@ Requires a full-access live key; test keys get 403 test_key_restricted.
 - `key` (string, required): The key, used as `{{global.key}}`: letters, digits, `_` and `-`, starting with a letter or `_`, up to 64; `global` is reserved. Limits: other keys → 422 invalid_parameter
 
 ```bash
-curl -X PUT 'https://api.zapsmtp.com/v1/variables/global/company_name' \
+curl -X PUT 'https://app.zapsmtp.com/v1/variables/global/company_name' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -1324,7 +1324,7 @@ Pass `template.id` (id or alias) and its `variables` instead of `subject`, `html
 Requires a full-access or sending-access key. Live keys: From domain must be verified by the account. Test keys: any From domain, nothing delivered, monthly quota not charged.
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -1377,7 +1377,7 @@ curl -X POST 'https://api.zapsmtp.com/v1/emails' \
 Requires a full-access or sending-access key. Live keys: From domain must be verified by the account. Test keys: any From domain, nothing delivered, monthly quota not charged.
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -1432,7 +1432,7 @@ Every other send field works as usual. The template is rendered when the request
 Requires a full-access or sending-access key. Live keys: From domain must be verified by the account. Test keys: any From domain, nothing delivered, monthly quota not charged.
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Idempotency-Key: order-A-1042-receipt' \
   -H 'Content-Type: application/json' \
@@ -1494,7 +1494,7 @@ Each item of a batch carries its own variables. With the default `x-batch-valida
 Requires a full-access or sending-access key. Test keys follow the same rules as for sending.
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails/batch' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails/batch' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '[

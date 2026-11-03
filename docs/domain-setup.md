@@ -79,7 +79,7 @@ Requires a full-access live key; test keys get 403 test_key_restricted.
 - `invalid_parameter` (HTTP 422): invalid domain name
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/domains' \
+curl -X POST 'https://app.zapsmtp.com/v1/domains' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -160,7 +160,7 @@ Requires a full-access live key; test keys get 403 test_key_restricted.
 - `invalid_parameter` (HTTP 422): invalid domain name
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/domains' \
+curl -X POST 'https://app.zapsmtp.com/v1/domains' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -238,7 +238,7 @@ Requires a full-access key.
 - `not_found` (HTTP 404): domain not found
 
 ```bash
-curl 'https://api.zapsmtp.com/v1/domains/019a1e9b-41c2-7a0e-b5d1-3f6c2e8a9d47' \
+curl 'https://app.zapsmtp.com/v1/domains/019a1e9b-41c2-7a0e-b5d1-3f6c2e8a9d47' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -390,7 +390,7 @@ Requires a full-access live key; test keys get 403 test_key_restricted.
 - `conflict` (HTTP 409): this domain is already verified by another account
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/domains/019a1e9b-41c2-7a0e-b5d1-3f6c2e8a9d47/verify' \
+curl -X POST 'https://app.zapsmtp.com/v1/domains/019a1e9b-41c2-7a0e-b5d1-3f6c2e8a9d47/verify' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -469,7 +469,7 @@ Requires a full-access key.
 - `restricted_api_key` (HTTP 403)
 
 ```bash
-curl 'https://api.zapsmtp.com/v1/domains' \
+curl 'https://app.zapsmtp.com/v1/domains' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -652,15 +652,16 @@ Add `rua` to your DMARC record (keep your policy). Providers send one report a d
 
 ### Query parameters
 
-- `days` (integer): 1-180; out-of-range falls back to 30. Default `30`.
+- `days` (integer): 1-180. Limits: 422 invalid_parameter otherwise. Default `30`.
 
 ### Errors
 
 - `restricted_api_key` (HTTP 403)
 - `not_found` (HTTP 404): Not a domain of this account.
+- `invalid_parameter` (HTTP 422): a query parameter is out of range or not one of its values
 
 ```bash
-curl 'https://api.zapsmtp.com/v1/domains/019a1e9b-41c2-7a0e-b5d1-3f6c2e8a9d47/dmarc?days=90' \
+curl 'https://app.zapsmtp.com/v1/domains/019a1e9b-41c2-7a0e-b5d1-3f6c2e8a9d47/dmarc?days=90' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -772,7 +773,7 @@ Requires a full-access key.
 - `not_found` (HTTP 404): domain not found
 
 ```bash
-curl 'https://api.zapsmtp.com/v1/domains/019a1e9b-41c2-7a0e-b5d1-3f6c2e8a9d47/brand' \
+curl 'https://app.zapsmtp.com/v1/domains/019a1e9b-41c2-7a0e-b5d1-3f6c2e8a9d47/brand' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -888,7 +889,7 @@ Hosted files are served publicly at /bimi/<domain>/logo.svg and /bimi/<domain>/c
 - `invalid_parameter` (HTTP 422)
 
 ```bash
-curl -X PUT 'https://api.zapsmtp.com/v1/domains/019a1e9b-41c2-7a0e-b5d1-3f6c2e8a9d47/brand' \
+curl -X PUT 'https://app.zapsmtp.com/v1/domains/019a1e9b-41c2-7a0e-b5d1-3f6c2e8a9d47/brand' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -1019,7 +1020,7 @@ Reply tracking: each tracked email gets its own signed Reply-To, e.g. `r1-<email
 - `invalid_parameter` (HTTP 422): bad tls; reply_domain not one of your inbound domains, not this domain or a subdomain of it, or without a verified MX record; reply_forward_to not a plain address, a receiving address, or not on a verified domain / confirmed forward destination; reply_tracking without a reply_domain
 
 ```bash
-curl -X PATCH 'https://api.zapsmtp.com/v1/domains/019a1e9b-41c2-7a0e-b5d1-3f6c2e8a9d47' \
+curl -X PATCH 'https://app.zapsmtp.com/v1/domains/019a1e9b-41c2-7a0e-b5d1-3f6c2e8a9d47' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -1113,7 +1114,7 @@ Reply tracking: each tracked email gets its own signed Reply-To, e.g. `r1-<email
 - `invalid_parameter` (HTTP 422): bad tls; reply_domain not one of your inbound domains, not this domain or a subdomain of it, or without a verified MX record; reply_forward_to not a plain address, a receiving address, or not on a verified domain / confirmed forward destination; reply_tracking without a reply_domain
 
 ```bash
-curl -X PATCH 'https://api.zapsmtp.com/v1/domains/019a1e9b-41c2-7a0e-b5d1-3f6c2e8a9d47' \
+curl -X PATCH 'https://app.zapsmtp.com/v1/domains/019a1e9b-41c2-7a0e-b5d1-3f6c2e8a9d47' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -1206,7 +1207,7 @@ Reply tracking: each tracked email gets its own signed Reply-To, e.g. `r1-<email
 - `invalid_parameter` (HTTP 422): bad tls; reply_domain not one of your inbound domains, not this domain or a subdomain of it, or without a verified MX record; reply_forward_to not a plain address, a receiving address, or not on a verified domain / confirmed forward destination; reply_tracking without a reply_domain
 
 ```bash
-curl -X PATCH 'https://api.zapsmtp.com/v1/domains/019a1e9b-41c2-7a0e-b5d1-3f6c2e8a9d47' \
+curl -X PATCH 'https://app.zapsmtp.com/v1/domains/019a1e9b-41c2-7a0e-b5d1-3f6c2e8a9d47' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -1292,7 +1293,7 @@ Customer domains are checked automatically every 6 hours (operator-configurable)
 - `not_found` (HTTP 404): domain not found
 
 ```bash
-curl 'https://api.zapsmtp.com/v1/domains/019a1e9b-41c2-7a0e-b5d1-3f6c2e8a9d47/reputation' \
+curl 'https://app.zapsmtp.com/v1/domains/019a1e9b-41c2-7a0e-b5d1-3f6c2e8a9d47/reputation' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -1389,7 +1390,7 @@ At most once per minute per domain name. No Retry-After header is set.
 - `rate_limit_exceeded` (HTTP 429): this domain was checked less than a minute ago
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/domains/019a1e9b-41c2-7a0e-b5d1-3f6c2e8a9d47/reputation/check' \
+curl -X POST 'https://app.zapsmtp.com/v1/domains/019a1e9b-41c2-7a0e-b5d1-3f6c2e8a9d47/reputation/check' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -1487,7 +1488,7 @@ Requires a full-access live key; test keys get 403 test_key_restricted.
 - `not_found` (HTTP 404): domain not found
 
 ```bash
-curl -X DELETE 'https://api.zapsmtp.com/v1/domains/019a1e9b-41c2-7a0e-b5d1-3f6c2e8a9d47' \
+curl -X DELETE 'https://app.zapsmtp.com/v1/domains/019a1e9b-41c2-7a0e-b5d1-3f6c2e8a9d47' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 

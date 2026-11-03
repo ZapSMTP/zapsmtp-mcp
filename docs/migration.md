@@ -101,7 +101,7 @@ After: environment:
 
 ```
 # Server environment: only these two values change
-RESEND_BASE_URL=https://api.zapsmtp.com/v1
+RESEND_BASE_URL=https://app.zapsmtp.com/v1
 RESEND_API_KEY=zap_your_api_key
 ```
 
@@ -126,7 +126,7 @@ await resend.emails.send({
 After (fetch):
 
 ```
-const res = await fetch('https://api.zapsmtp.com/v1/emails', {
+const res = await fetch('https://app.zapsmtp.com/v1/emails', {
   method: 'POST',
   headers: {
     Authorization: 'Bearer ' + process.env.ZAP_API_KEY,
@@ -167,7 +167,7 @@ After (ZapSMTP):
 import os, requests
 
 r = requests.post(
-    "https://api.zapsmtp.com/v1/emails",
+    "https://app.zapsmtp.com/v1/emails",
     headers={"Authorization": f"Bearer {os.environ['ZAP_API_KEY']}"},
     json={
         "from": "Acme <hello@acme.com>",
@@ -218,7 +218,7 @@ With reply tracking on, the response carries `reply_to`: the tracked address the
 - `text` (string): Plain-text body. When only `html` is given, a plain-text part is generated from it (readable text, links as `text (url)`, hidden elements such as the preheader left out).
 - `headers` (object<string,string>): Custom headers. Limits: Reserved headers are rejected (422 invalid_parameter "header ... cannot be set"): From, To, Cc, Bcc, Reply-To, Subject, Date, Message-Id, Mime-Version, Content-Type, Content-Transfer-Encoding, DKIM-Signature, Return-Path, Received, any X-Zap-*, X-ZapRef. Names must be printable ASCII without spaces or ':'.
 - `attachments` (object[]): Attachments; 40 MB total. Limits: 422 invalid_attachment with message attachments[i]: set either content or path, not both | content must be base64 | content or path is required | filename is required | path must be an http(s) URL | fetching path returned HTTP <n> | attachments exceed 40MB in total
-  - `filename` (string, required): File name shown to the recipient.
+  - `filename` (string): File name shown to the recipient. Required with `content`; with `path` it defaults to the last segment of the URL.
   - `content` (string): File content, base64-encoded. Set `content` or `path`, not both.
   - `path` (string): An HTTPS URL we download the file from instead (private and internal addresses are refused).
   - `content_type` (string): MIME type. Detected from the file name when omitted.
@@ -236,7 +236,7 @@ With reply tracking on, the response carries `reply_to`: the tracked address the
 - `template` (object): Render a stored, published template: id = template id or alias. Request subject/from override the template's. Cannot be combined with html/text. Limits: missing id → 422 missing_required_field "template.id is required"; unknown → 422 invalid_parameter "template <id> not found"; never published → 422 invalid_parameter; `variables.global` → 422 invalid_parameter (reserved); a value of the wrong type → 422 template_variables_invalid; a required variable without value or default → 422 template_variables_missing; anything else the template uses still absent → 422 template_render_error "missing template variables: a, b"
   - `id` (string, required): Template id or alias. The template must be published.
   - `variables` (object): Values for the template’s own variables. Checked against the published [variable schema](https://zapsmtp.com/docs/templating/#schema): defaults fill absent values, optional variables without one render empty, names the schema does not declare are passed through. `global` is reserved: global variables come from the account.
-- `tls` (string): `required` or `verified`: deliver only over TLS (`verified`: with a valid certificate for the receiving server). Raises the domain's policy, never lowers it.
+- `tls` (string): `opportunistic`, `required` or `verified`: `required` delivers only over TLS, `verified` only with a valid certificate for the receiving server. The stricter of this and the domain’s policy applies: it raises the domain’s policy, never lowers it.
 
 ### Errors
 
@@ -245,6 +245,7 @@ With reply tracking on, the response carries `reply_to`: the tracked address the
 - `domain_not_verified` (HTTP 403): sender domain is not verified for this account
 - `restricted_api_key` (HTTP 403): key restricted to another domain or stream
 - `account_suspended` (HTTP 403): account is suspended
+- `account_closing` (HTTP 403): account is scheduled for deletion (an owner can cancel it in the dashboard)
 - `idempotency_key_reused` (HTTP 409)
 - `idempotency_request_in_progress` (HTTP 409)
 - `payload_too_large` (HTTP 413): request body exceeds 40MB
@@ -263,7 +264,7 @@ With reply tracking on, the response carries `reply_to`: the tracked address the
 - `service_unavailable` (HTTP 503): a backing store failing over ("a backing service is failing over; retry shortly", Retry-After: 2); MTA unreachable ("mail transfer agent temporarily unavailable, retry"), suppression list being rebuilt ("suppression list is being rebuilt, retry shortly"), or too many large request bodies in flight (Retry-After: 5)
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Idempotency-Key: order-1042-receipt' \
   -H 'Content-Type: application/json' \
@@ -342,7 +343,7 @@ await sgMail.send({
 After (Node.js):
 
 ```
-await fetch('https://api.zapsmtp.com/v1/emails', {
+await fetch('https://app.zapsmtp.com/v1/emails', {
   method: 'POST',
   headers: { Authorization: 'Bearer ' + process.env.ZAP_API_KEY, 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -378,7 +379,7 @@ After (Python):
 import os, requests
 
 requests.post(
-    "https://api.zapsmtp.com/v1/emails",
+    "https://app.zapsmtp.com/v1/emails",
     headers={"Authorization": f"Bearer {os.environ['ZAP_API_KEY']}"},
     json={
         "from": "Acme <hello@acme.com>",
@@ -431,7 +432,7 @@ An item of `data` carries `reply_to` when reply tracking is on for that email.
 - `service_unavailable` (HTTP 503): too many large bodies in flight
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails/batch' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails/batch' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '[
@@ -474,6 +475,9 @@ curl -X POST 'https://api.zapsmtp.com/v1/emails/batch' \
       "id": "019a1f2e-7c3c-7a10-8b21-4d5e6f7a8b9c",
       "suppressed": [
         "old@example.org"
+      ],
+      "failed_recipients": [
+        "typo@exmaple.org"
       ]
     }
   ],
@@ -537,7 +541,7 @@ await fetch('https://api.mailgun.net/v3/mg.acme.com/messages', {
 After (Node.js):
 
 ```
-await fetch('https://api.zapsmtp.com/v1/emails', {
+await fetch('https://app.zapsmtp.com/v1/emails', {
   method: 'POST',
   headers: { Authorization: 'Bearer ' + process.env.ZAP_API_KEY, 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -576,7 +580,7 @@ After (Python):
 import os, requests
 
 requests.post(
-    "https://api.zapsmtp.com/v1/emails",
+    "https://app.zapsmtp.com/v1/emails",
     headers={"Authorization": f"Bearer {os.environ['ZAP_API_KEY']}"},
     json={
         "from": "Acme <hello@acme.com>",
@@ -626,7 +630,7 @@ With reply tracking on, the response carries `reply_to`: the tracked address the
 - `text` (string): Plain-text body. When only `html` is given, a plain-text part is generated from it (readable text, links as `text (url)`, hidden elements such as the preheader left out).
 - `headers` (object<string,string>): Custom headers. Limits: Reserved headers are rejected (422 invalid_parameter "header ... cannot be set"): From, To, Cc, Bcc, Reply-To, Subject, Date, Message-Id, Mime-Version, Content-Type, Content-Transfer-Encoding, DKIM-Signature, Return-Path, Received, any X-Zap-*, X-ZapRef. Names must be printable ASCII without spaces or ':'.
 - `attachments` (object[]): Attachments; 40 MB total. Limits: 422 invalid_attachment with message attachments[i]: set either content or path, not both | content must be base64 | content or path is required | filename is required | path must be an http(s) URL | fetching path returned HTTP <n> | attachments exceed 40MB in total
-  - `filename` (string, required): File name shown to the recipient.
+  - `filename` (string): File name shown to the recipient. Required with `content`; with `path` it defaults to the last segment of the URL.
   - `content` (string): File content, base64-encoded. Set `content` or `path`, not both.
   - `path` (string): An HTTPS URL we download the file from instead (private and internal addresses are refused).
   - `content_type` (string): MIME type. Detected from the file name when omitted.
@@ -644,7 +648,7 @@ With reply tracking on, the response carries `reply_to`: the tracked address the
 - `template` (object): Render a stored, published template: id = template id or alias. Request subject/from override the template's. Cannot be combined with html/text. Limits: missing id → 422 missing_required_field "template.id is required"; unknown → 422 invalid_parameter "template <id> not found"; never published → 422 invalid_parameter; `variables.global` → 422 invalid_parameter (reserved); a value of the wrong type → 422 template_variables_invalid; a required variable without value or default → 422 template_variables_missing; anything else the template uses still absent → 422 template_render_error "missing template variables: a, b"
   - `id` (string, required): Template id or alias. The template must be published.
   - `variables` (object): Values for the template’s own variables. Checked against the published [variable schema](https://zapsmtp.com/docs/templating/#schema): defaults fill absent values, optional variables without one render empty, names the schema does not declare are passed through. `global` is reserved: global variables come from the account.
-- `tls` (string): `required` or `verified`: deliver only over TLS (`verified`: with a valid certificate for the receiving server). Raises the domain's policy, never lowers it.
+- `tls` (string): `opportunistic`, `required` or `verified`: `required` delivers only over TLS, `verified` only with a valid certificate for the receiving server. The stricter of this and the domain’s policy applies: it raises the domain’s policy, never lowers it.
 
 ### Errors
 
@@ -653,6 +657,7 @@ With reply tracking on, the response carries `reply_to`: the tracked address the
 - `domain_not_verified` (HTTP 403): sender domain is not verified for this account
 - `restricted_api_key` (HTTP 403): key restricted to another domain or stream
 - `account_suspended` (HTTP 403): account is suspended
+- `account_closing` (HTTP 403): account is scheduled for deletion (an owner can cancel it in the dashboard)
 - `idempotency_key_reused` (HTTP 409)
 - `idempotency_request_in_progress` (HTTP 409)
 - `payload_too_large` (HTTP 413): request body exceeds 40MB
@@ -671,7 +676,7 @@ With reply tracking on, the response carries `reply_to`: the tracked address the
 - `service_unavailable` (HTTP 503): a backing store failing over ("a backing service is failing over; retry shortly", Retry-After: 2); MTA unreachable ("mail transfer agent temporarily unavailable, retry"), suppression list being rebuilt ("suppression list is being rebuilt, retry shortly"), or too many large request bodies in flight (Retry-After: 5)
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -751,7 +756,7 @@ await client.sendEmailWithTemplate({
 After (Node.js):
 
 ```
-await fetch('https://api.zapsmtp.com/v1/emails', {
+await fetch('https://app.zapsmtp.com/v1/emails', {
   method: 'POST',
   headers: { Authorization: 'Bearer ' + process.env.ZAP_API_KEY, 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -786,7 +791,7 @@ After (Python):
 import os, requests
 
 requests.post(
-    "https://api.zapsmtp.com/v1/emails",
+    "https://app.zapsmtp.com/v1/emails",
     headers={"Authorization": f"Bearer {os.environ['ZAP_API_KEY']}"},
     json={
         "from": "Acme <hello@acme.com>",
@@ -833,7 +838,7 @@ With reply tracking on, the response carries `reply_to`: the tracked address the
 - `text` (string): Plain-text body. When only `html` is given, a plain-text part is generated from it (readable text, links as `text (url)`, hidden elements such as the preheader left out).
 - `headers` (object<string,string>): Custom headers. Limits: Reserved headers are rejected (422 invalid_parameter "header ... cannot be set"): From, To, Cc, Bcc, Reply-To, Subject, Date, Message-Id, Mime-Version, Content-Type, Content-Transfer-Encoding, DKIM-Signature, Return-Path, Received, any X-Zap-*, X-ZapRef. Names must be printable ASCII without spaces or ':'.
 - `attachments` (object[]): Attachments; 40 MB total. Limits: 422 invalid_attachment with message attachments[i]: set either content or path, not both | content must be base64 | content or path is required | filename is required | path must be an http(s) URL | fetching path returned HTTP <n> | attachments exceed 40MB in total
-  - `filename` (string, required): File name shown to the recipient.
+  - `filename` (string): File name shown to the recipient. Required with `content`; with `path` it defaults to the last segment of the URL.
   - `content` (string): File content, base64-encoded. Set `content` or `path`, not both.
   - `path` (string): An HTTPS URL we download the file from instead (private and internal addresses are refused).
   - `content_type` (string): MIME type. Detected from the file name when omitted.
@@ -851,7 +856,7 @@ With reply tracking on, the response carries `reply_to`: the tracked address the
 - `template` (object): Render a stored, published template: id = template id or alias. Request subject/from override the template's. Cannot be combined with html/text. Limits: missing id → 422 missing_required_field "template.id is required"; unknown → 422 invalid_parameter "template <id> not found"; never published → 422 invalid_parameter; `variables.global` → 422 invalid_parameter (reserved); a value of the wrong type → 422 template_variables_invalid; a required variable without value or default → 422 template_variables_missing; anything else the template uses still absent → 422 template_render_error "missing template variables: a, b"
   - `id` (string, required): Template id or alias. The template must be published.
   - `variables` (object): Values for the template’s own variables. Checked against the published [variable schema](https://zapsmtp.com/docs/templating/#schema): defaults fill absent values, optional variables without one render empty, names the schema does not declare are passed through. `global` is reserved: global variables come from the account.
-- `tls` (string): `required` or `verified`: deliver only over TLS (`verified`: with a valid certificate for the receiving server). Raises the domain's policy, never lowers it.
+- `tls` (string): `opportunistic`, `required` or `verified`: `required` delivers only over TLS, `verified` only with a valid certificate for the receiving server. The stricter of this and the domain’s policy applies: it raises the domain’s policy, never lowers it.
 
 ### Errors
 
@@ -860,6 +865,7 @@ With reply tracking on, the response carries `reply_to`: the tracked address the
 - `domain_not_verified` (HTTP 403): sender domain is not verified for this account
 - `restricted_api_key` (HTTP 403): key restricted to another domain or stream
 - `account_suspended` (HTTP 403): account is suspended
+- `account_closing` (HTTP 403): account is scheduled for deletion (an owner can cancel it in the dashboard)
 - `idempotency_key_reused` (HTTP 409)
 - `idempotency_request_in_progress` (HTTP 409)
 - `payload_too_large` (HTTP 413): request body exceeds 40MB
@@ -878,7 +884,7 @@ With reply tracking on, the response carries `reply_to`: the tracked address the
 - `service_unavailable` (HTTP 503): a backing store failing over ("a backing service is failing over; retry shortly", Retry-After: 2); MTA unreachable ("mail transfer agent temporarily unavailable, retry"), suppression list being rebuilt ("suppression list is being rebuilt, retry shortly"), or too many large request bodies in flight (Retry-After: 5)
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -950,7 +956,7 @@ await ses.send(new SendEmailCommand({
 After (Node.js):
 
 ```
-await fetch('https://api.zapsmtp.com/v1/emails', {
+await fetch('https://app.zapsmtp.com/v1/emails', {
   method: 'POST',
   headers: { Authorization: 'Bearer ' + process.env.ZAP_API_KEY, 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -986,7 +992,7 @@ After (Python):
 import os, requests
 
 requests.post(
-    "https://api.zapsmtp.com/v1/emails",
+    "https://app.zapsmtp.com/v1/emails",
     headers={"Authorization": f"Bearer {os.environ['ZAP_API_KEY']}"},
     json={
         "from": "Acme <hello@acme.com>",
@@ -1062,7 +1068,7 @@ Requires a full-access key.
 - `template_render_error` (HTTP 422): <field>: <syntax error>
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/templates/render' \
+curl -X POST 'https://app.zapsmtp.com/v1/templates/render' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -1185,11 +1191,12 @@ To send clicks of one button to this endpoint: `{"events": ["email.clicked"], "f
 ### Body parameters
 
 - `url` (string, required): Absolute https:// URL. Limits: 422 invalid_parameter "url must be an absolute https:// URL"
-- `events` (string[]): Limits: unknown type → 422 invalid_parameter "unknown event type <x>; allowed: ..." One of `email.sent`, `email.delivered`, `email.delivery_delayed`, `email.bounced`, `email.complained`, `email.failed`, `email.opened`, `email.clicked`, `email.suppressed`, `email.received`, `thread.created`, `thread.replied`, `email.replied`. Default `all event types`.
+- `events` (string[]): Limits: unknown type → 422 invalid_parameter "unknown event type <x>; allowed: ..." One of `email.sent`, `email.delivered`, `email.delivery_delayed`, `email.bounced`, `email.complained`, `email.failed`, `email.opened`, `email.clicked`, `email.suppressed`, `email.received`, `thread.created`, `thread.replied`, `email.replied`, `email.opened_unique`, `email.clicked_unique`, `email.unsubscribed`, `email.forward_failed`, `domain.verified`, `domain.reputation_changed`, `email.scheduled`, `suppression.added`, `suppression.removed`, `domain.created`, `domain.deleted`. Default `every type except email.opened_unique and email.clicked_unique`.
 - `include_content` (boolean): `email.received` carries the message: text, html, headers, and download links (valid 24 hours) for the attachments and the raw .eml; text and html are cut at 1 MB in total (`truncated: true`). Default `false`.
 - `batch` (boolean): Send events up to 100 per request (or every second) as a JSON array, signed as one body; `Zap-Event-Id` is the batch id, each event keeps its own `id`. `email.received` with the full message still arrives alone. Default `false`.
-- `filter` (object): Narrows `email.clicked` to some [click actions](https://zapsmtp.com/docs/click-actions/); other event types are not affected. Empty or absent: every click. Default `{"actions": []}`.
+- `filter` (object): Narrows what the endpoint receives: `actions` narrows `email.clicked` (and `email.clicked_unique`) to some [click actions](https://zapsmtp.com/docs/click-actions/); `domains` narrows every event to some domains. Empty or absent: every click, every domain. Default `{"actions": [], "domains": []}`.
   - `actions` (string[]): Action names (lowercase letters, digits, `_`, `.` and `-`, starting with a letter or digit, up to 64 characters). The endpoint then receives `email.clicked` only for links with one of these actions. Limits: more than 50 → 422 invalid_parameter "filter.actions: at most 50"; a bad name → 422 invalid_parameter "filter.actions: <name> is not an action name"
+  - `domains` (string[]): Sending or receiving domains (lower case). The endpoint then receives only events of these domains: the From domain of sent email, the receiving domain of received mail, the domain of `domain.*` events. Limits: more than 50 → 422 invalid_parameter "filter.actions and filter.domains: at most 50 each"; a bad name → 422 invalid_parameter "filter.domains: <name> is not a domain name"
 
 ### Errors
 
@@ -1198,7 +1205,7 @@ To send clicks of one button to this endpoint: `{"events": ["email.clicked"], "f
 - `invalid_parameter` (HTTP 422)
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/webhooks' \
+curl -X POST 'https://app.zapsmtp.com/v1/webhooks' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -1232,7 +1239,8 @@ curl -X POST 'https://api.zapsmtp.com/v1/webhooks' \
   "include_content": false,
   "batch": false,
   "filter": {
-    "actions": []
+    "actions": [],
+    "domains": []
   }
 }
 ```
@@ -1249,7 +1257,7 @@ Node.js:
 // node import-suppressions.mjs suppressed.txt  (one address per line)
 import { readFileSync } from 'node:fs';
 
-const API = 'https://api.zapsmtp.com/v1';
+const API = 'https://app.zapsmtp.com/v1';
 const emails = [...new Set(readFileSync(process.argv[2], 'utf8')
   .split(/\r?\n/).map((s) => s.trim().toLowerCase()).filter(Boolean))];
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -1281,7 +1289,7 @@ Python:
 # python import_suppressions.py suppressed.txt  (one address per line)
 import os, sys, time, requests
 
-API = "https://api.zapsmtp.com/v1"
+API = "https://app.zapsmtp.com/v1"
 with open(sys.argv[1]) as f:
     emails = sorted({line.strip().lower() for line in f if line.strip()})
 
@@ -1320,7 +1328,7 @@ Requires a full-access live key; test keys get 403 test_key_restricted.
 - `invalid_parameter` (HTTP 422): Empty or over 1,000 addresses, an invalid address, or an unknown reason.
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/suppressions/batch' \
+curl -X POST 'https://app.zapsmtp.com/v1/suppressions/batch' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -1365,7 +1373,7 @@ Requires a full-access live key; test keys get 403 test_key_restricted.
 - `invalid_parameter` (HTTP 422): Empty or over 1,000 addresses, an invalid address, or an unknown reason.
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/suppressions/batch' \
+curl -X POST 'https://app.zapsmtp.com/v1/suppressions/batch' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -1447,7 +1455,7 @@ Requires a full-access live key; test keys get 403 test_key_restricted.
 - `invalid_parameter` (HTTP 422): invalid domain name
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/domains' \
+curl -X POST 'https://app.zapsmtp.com/v1/domains' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -1545,7 +1553,7 @@ With reply tracking on, the response carries `reply_to`: the tracked address the
 - `text` (string): Plain-text body. When only `html` is given, a plain-text part is generated from it (readable text, links as `text (url)`, hidden elements such as the preheader left out).
 - `headers` (object<string,string>): Custom headers. Limits: Reserved headers are rejected (422 invalid_parameter "header ... cannot be set"): From, To, Cc, Bcc, Reply-To, Subject, Date, Message-Id, Mime-Version, Content-Type, Content-Transfer-Encoding, DKIM-Signature, Return-Path, Received, any X-Zap-*, X-ZapRef. Names must be printable ASCII without spaces or ':'.
 - `attachments` (object[]): Attachments; 40 MB total. Limits: 422 invalid_attachment with message attachments[i]: set either content or path, not both | content must be base64 | content or path is required | filename is required | path must be an http(s) URL | fetching path returned HTTP <n> | attachments exceed 40MB in total
-  - `filename` (string, required): File name shown to the recipient.
+  - `filename` (string): File name shown to the recipient. Required with `content`; with `path` it defaults to the last segment of the URL.
   - `content` (string): File content, base64-encoded. Set `content` or `path`, not both.
   - `path` (string): An HTTPS URL we download the file from instead (private and internal addresses are refused).
   - `content_type` (string): MIME type. Detected from the file name when omitted.
@@ -1563,7 +1571,7 @@ With reply tracking on, the response carries `reply_to`: the tracked address the
 - `template` (object): Render a stored, published template: id = template id or alias. Request subject/from override the template's. Cannot be combined with html/text. Limits: missing id → 422 missing_required_field "template.id is required"; unknown → 422 invalid_parameter "template <id> not found"; never published → 422 invalid_parameter; `variables.global` → 422 invalid_parameter (reserved); a value of the wrong type → 422 template_variables_invalid; a required variable without value or default → 422 template_variables_missing; anything else the template uses still absent → 422 template_render_error "missing template variables: a, b"
   - `id` (string, required): Template id or alias. The template must be published.
   - `variables` (object): Values for the template’s own variables. Checked against the published [variable schema](https://zapsmtp.com/docs/templating/#schema): defaults fill absent values, optional variables without one render empty, names the schema does not declare are passed through. `global` is reserved: global variables come from the account.
-- `tls` (string): `required` or `verified`: deliver only over TLS (`verified`: with a valid certificate for the receiving server). Raises the domain's policy, never lowers it.
+- `tls` (string): `opportunistic`, `required` or `verified`: `required` delivers only over TLS, `verified` only with a valid certificate for the receiving server. The stricter of this and the domain’s policy applies: it raises the domain’s policy, never lowers it.
 
 ### Errors
 
@@ -1572,6 +1580,7 @@ With reply tracking on, the response carries `reply_to`: the tracked address the
 - `domain_not_verified` (HTTP 403): sender domain is not verified for this account
 - `restricted_api_key` (HTTP 403): key restricted to another domain or stream
 - `account_suspended` (HTTP 403): account is suspended
+- `account_closing` (HTTP 403): account is scheduled for deletion (an owner can cancel it in the dashboard)
 - `idempotency_key_reused` (HTTP 409)
 - `idempotency_request_in_progress` (HTTP 409)
 - `payload_too_large` (HTTP 413): request body exceeds 40MB
@@ -1590,7 +1599,7 @@ With reply tracking on, the response carries `reply_to`: the tracked address the
 - `service_unavailable` (HTTP 503): a backing store failing over ("a backing service is failing over; retry shortly", Retry-After: 2); MTA unreachable ("mail transfer agent temporarily unavailable, retry"), suppression list being rebuilt ("suppression list is being rebuilt, retry shortly"), or too many large request bodies in flight (Retry-After: 5)
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -1623,7 +1632,7 @@ Node.js:
 // templates, the email log and webhooks, deliver nothing and are not counted.
 export async function send(msg) {
   const result = await oldProvider.send(msg);           // still the source of truth
-  fetch('https://api.zapsmtp.com/v1/emails', {
+  fetch('https://app.zapsmtp.com/v1/emails', {
     method: 'POST',
     headers: { Authorization: 'Bearer ' + process.env.ZAP_TEST_KEY, 'Content-Type': 'application/json' },
     body: JSON.stringify(toZap(msg)),
@@ -1643,7 +1652,7 @@ def send(msg: dict):
     result = old_provider.send(msg)  # still the source of truth
     def shadow():
         try:
-            r = requests.post("https://api.zapsmtp.com/v1/emails", timeout=10,
+            r = requests.post("https://app.zapsmtp.com/v1/emails", timeout=10,
                               headers={"Authorization": f"Bearer {os.environ['ZAP_TEST_KEY']}"},
                               json=to_zap(msg))
             if not r.ok:
@@ -1671,7 +1680,7 @@ const bucket = (email) => createHash('sha256').update(email.toLowerCase()).diges
 
 export async function send(msg, idempotencyKey) {
   if (bucket(msg.to) >= Number(process.env.ZAP_PERCENT ?? 0)) return oldProvider.send(msg);
-  const res = await fetch('https://api.zapsmtp.com/v1/emails', {
+  const res = await fetch('https://app.zapsmtp.com/v1/emails', {
     method: 'POST',
     headers: {
       Authorization: 'Bearer ' + process.env.ZAP_API_KEY,
@@ -1698,7 +1707,7 @@ def bucket(email: str) -> int:
 def send(msg: dict, idempotency_key: str):
     if bucket(msg["to"]) >= int(os.environ.get("ZAP_PERCENT", "0")):
         return old_provider.send(msg)
-    r = requests.post("https://api.zapsmtp.com/v1/emails", timeout=30, json=to_zap(msg), headers={
+    r = requests.post("https://app.zapsmtp.com/v1/emails", timeout=30, json=to_zap(msg), headers={
         "Authorization": f"Bearer {os.environ['ZAP_API_KEY']}",
         "Idempotency-Key": idempotency_key,
     })
@@ -1740,7 +1749,7 @@ Requires a full-access key.
 
 ### Query parameters
 
-- `limit` (integer): 1-1000; out-of-range falls back to 100. Default `100`.
+- `limit` (integer): 1-1000. Limits: 422 invalid_parameter otherwise. Default `100`.
 - `after` (string): Opaque cursor from next_cursor. Limits: 422 invalid_parameter "invalid after cursor"
 - `before` (string): Legacy: RFC 3339 timestamp; returns entries created before it. Ignored when after is set. Limits: 422 invalid_parameter "before must be RFC3339"
 
@@ -1750,7 +1759,7 @@ Requires a full-access key.
 - `invalid_parameter` (HTTP 422)
 
 ```bash
-curl 'https://api.zapsmtp.com/v1/suppressions?limit=1000' \
+curl 'https://app.zapsmtp.com/v1/suppressions?limit=1000' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 

@@ -6,6 +6,8 @@ Source: https://zapsmtp.com/docs/sdks/
 
 Official libraries for seven languages, Laravel and Rails. Every one covers the whole API and behaves the same way: it retries safely, walks every page of a list, raises typed errors and verifies webhook signatures.
 
+> The packages are being published to their registries. Until they are, every example in the [API reference](https://zapsmtp.com/docs/) calls the HTTP API directly, and the [OpenAPI description](https://zapsmtp.com/openapi.json) is available now.
+
 ## Libraries
 
 ### Node.js
@@ -16,8 +18,6 @@ TypeScript types for every request and response; ESM and CommonJS; no dependenci
 
 Node.js 18+, Bun, Deno
 
-[GitHub](https://github.com/ZapSMTP/zapsmtp-node)[npm](https://www.npmjs.com/package/zapsmtp)
-
 ### Python
 
 `pip install zapsmtp`
@@ -25,8 +25,6 @@ Node.js 18+, Bun, Deno
 Sync and async clients, typed models, httpx underneath.
 
 Python 3.9+
-
-[GitHub](https://github.com/ZapSMTP/zapsmtp-python)[PyPI](https://pypi.org/project/zapsmtp/)
 
 ### PHP
 
@@ -36,17 +34,13 @@ PSR-18 HTTP client, Guzzle by default; typed models with array access.
 
 PHP 8.1+
 
-[GitHub](https://github.com/ZapSMTP/zapsmtp-php)[Packagist](https://packagist.org/packages/zapsmtp/zapsmtp-php)
-
 ### Laravel
 
 `composer require zapsmtp/zapsmtp-laravel`
 
 A mail transport for your Mailables, a facade for the API and verified webhook events.
 
-Laravel 10, 11, 12
-
-[GitHub](https://github.com/ZapSMTP/zapsmtp-laravel)[Packagist](https://packagist.org/packages/zapsmtp/zapsmtp-laravel)
+Laravel 12.60+, 13
 
 ### Go
 
@@ -56,8 +50,6 @@ Standard library only; context on every call; range over every page.
 
 Go 1.23+
 
-[GitHub](https://github.com/ZapSMTP/zapsmtp-go)[pkg.go.dev](https://pkg.go.dev/github.com/zapsmtp/zapsmtp-go)
-
 ### Ruby
 
 `gem install zapsmtp`
@@ -66,17 +58,13 @@ Standard library only; an ActionMailer delivery method for Rails.
 
 Ruby 3.0+
 
-[GitHub](https://github.com/ZapSMTP/zapsmtp-ruby)[RubyGems](https://rubygems.org/gems/zapsmtp)
-
 ### Java
 
-`implementation("com.zapsmtp:zapsmtp-java:0.1.0")`
+`implementation("com.zapsmtp:zapsmtp-java:0.1.6")`
 
 Builders for every request, immutable models, java.net.http underneath.
 
 Java 11+
-
-[GitHub](https://github.com/ZapSMTP/zapsmtp-java)[Maven Central](https://central.sonatype.com/artifact/com.zapsmtp/zapsmtp-java)
 
 ### .NET
 
@@ -85,8 +73,6 @@ Java 11+
 Async API with cancellation, dependency injection, IAsyncEnumerable paging.
 
 .NET 8, .NET Standard 2.0
-
-[GitHub](https://github.com/ZapSMTP/zapsmtp-dotnet)[NuGet](https://www.nuget.org/packages/ZapSMTP)
 
 ## Send your first email
 
@@ -224,9 +210,9 @@ Console.WriteLine(email.Id);
 ## What every SDK does
 
 - **The whole API.** Every endpoint in the reference, with types for its parameters and response. The libraries are generated from the same description as these pages, so a new endpoint reaches every language at once.
-- **Safe retries.** Rate limits (`429`), server errors and lost connections are retried twice by default, waiting as `Retry-After` says or backing off exponentially. Sends always carry an `Idempotency-Key`, so a retried send never goes out twice; pass your own key to tie a send to your order or event.
+- **Safe retries.** Rate limits (`429`, except quota and reply-limit errors), `408`, `500`, `502`, `503`, `504` and lost connections are retried twice by default, waiting as `Retry-After` says or backing off exponentially. Sends always carry an `Idempotency-Key`, so a retried send never goes out twice; pass your own key to tie a send to your order or event.
 - **Every page.** List methods return one page; each SDK can also iterate every item of every page.
-- **Typed errors.** Authentication, permission, not found, conflict, validation, rate limit, server and connection errors are separate classes carrying the status, the error `code` and the request id. See [Errors, limits & paging](https://zapsmtp.com/docs/conventions/).
+- **Typed errors.** Authentication, permission, not found, conflict, validation, rate limit, server and connection errors are separate classes carrying the status, the error `code` and the request id (in Go one `*zapsmtp.Error` with `errors.As` and helpers such as `IsRateLimit`). See [Errors, limits & paging](https://zapsmtp.com/docs/conventions/).
 - **Webhook verification.** One call checks the `Zap-Signature` header in constant time, rejects signatures older than five minutes and accepts both secrets during a rotation.
 - **Configuration.** The key comes from `ZAP_API_KEY` and the base URL from `ZAP_BASE_URL` when not passed in code. Timeouts, retries and extra headers can be set per client or per request.
 
@@ -303,8 +289,6 @@ var evt = Webhooks.Verify(body, Request.Headers["Zap-Signature"].ToString(),
 ## OpenAPI
 
 The whole API as an [OpenAPI 3.1 description](https://zapsmtp.com/openapi.json): every operation with its parameters, request and response schemas and documented errors. Import it into Postman or Insomnia, or generate a client for a language without an SDK (Rust, Elixir, Dart, Swift) with [OpenAPI Generator](https://openapi-generator.tech). Each operation's `x-sdk-method` names the SDK method that calls it.
-
-Its repository: [github.com/ZapSMTP/zapsmtp-openapi](https://github.com/ZapSMTP/zapsmtp-openapi).
 
 ## Other clients
 

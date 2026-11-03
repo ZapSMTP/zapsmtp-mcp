@@ -10,7 +10,7 @@ One HTTP request or an SMTP connection. Every example on these pages runs for re
 2. **Send to the simulator.** Addresses at `simulator.zapsmtp.com` act out delivery scenarios: `delivered@`, `bounced@`, `complained@` and [more](https://zapsmtp.com/docs/testing/).
 3. **Verify your domain and switch to a live key.** Add your domain, publish the DNS records it gives you and [verify it](https://zapsmtp.com/docs/domains/verify-domain/). Live keys send only from verified domains.
 
-> Base URL `https://api.zapsmtp.com/v1`. Authenticate with `Authorization: Bearer <key>`. Requests and responses are JSON.
+> Base URL `https://app.zapsmtp.com/v1`. Authenticate with `Authorization: Bearer <key>`. Requests and responses are JSON.
 
 ## Send your first email
 
@@ -46,7 +46,7 @@ With reply tracking on, the response carries `reply_to`: the tracked address the
 - `text` (string): Plain-text body. When only `html` is given, a plain-text part is generated from it (readable text, links as `text (url)`, hidden elements such as the preheader left out).
 - `headers` (object<string,string>): Custom headers. Limits: Reserved headers are rejected (422 invalid_parameter "header ... cannot be set"): From, To, Cc, Bcc, Reply-To, Subject, Date, Message-Id, Mime-Version, Content-Type, Content-Transfer-Encoding, DKIM-Signature, Return-Path, Received, any X-Zap-*, X-ZapRef. Names must be printable ASCII without spaces or ':'.
 - `attachments` (object[]): Attachments; 40 MB total. Limits: 422 invalid_attachment with message attachments[i]: set either content or path, not both | content must be base64 | content or path is required | filename is required | path must be an http(s) URL | fetching path returned HTTP <n> | attachments exceed 40MB in total
-  - `filename` (string, required): File name shown to the recipient.
+  - `filename` (string): File name shown to the recipient. Required with `content`; with `path` it defaults to the last segment of the URL.
   - `content` (string): File content, base64-encoded. Set `content` or `path`, not both.
   - `path` (string): An HTTPS URL we download the file from instead (private and internal addresses are refused).
   - `content_type` (string): MIME type. Detected from the file name when omitted.
@@ -64,7 +64,7 @@ With reply tracking on, the response carries `reply_to`: the tracked address the
 - `template` (object): Render a stored, published template: id = template id or alias. Request subject/from override the template's. Cannot be combined with html/text. Limits: missing id → 422 missing_required_field "template.id is required"; unknown → 422 invalid_parameter "template <id> not found"; never published → 422 invalid_parameter; `variables.global` → 422 invalid_parameter (reserved); a value of the wrong type → 422 template_variables_invalid; a required variable without value or default → 422 template_variables_missing; anything else the template uses still absent → 422 template_render_error "missing template variables: a, b"
   - `id` (string, required): Template id or alias. The template must be published.
   - `variables` (object): Values for the template’s own variables. Checked against the published [variable schema](https://zapsmtp.com/docs/templating/#schema): defaults fill absent values, optional variables without one render empty, names the schema does not declare are passed through. `global` is reserved: global variables come from the account.
-- `tls` (string): `required` or `verified`: deliver only over TLS (`verified`: with a valid certificate for the receiving server). Raises the domain's policy, never lowers it.
+- `tls` (string): `opportunistic`, `required` or `verified`: `required` delivers only over TLS, `verified` only with a valid certificate for the receiving server. The stricter of this and the domain’s policy applies: it raises the domain’s policy, never lowers it.
 
 ### Errors
 
@@ -73,6 +73,7 @@ With reply tracking on, the response carries `reply_to`: the tracked address the
 - `domain_not_verified` (HTTP 403): sender domain is not verified for this account
 - `restricted_api_key` (HTTP 403): key restricted to another domain or stream
 - `account_suspended` (HTTP 403): account is suspended
+- `account_closing` (HTTP 403): account is scheduled for deletion (an owner can cancel it in the dashboard)
 - `idempotency_key_reused` (HTTP 409)
 - `idempotency_request_in_progress` (HTTP 409)
 - `payload_too_large` (HTTP 413): request body exceeds 40MB
@@ -91,7 +92,7 @@ With reply tracking on, the response carries `reply_to`: the tracked address the
 - `service_unavailable` (HTTP 503): a backing store failing over ("a backing service is failing over; retry shortly", Retry-After: 2); MTA unreachable ("mail transfer agent temporarily unavailable, retry"), suppression list being rebuilt ("suppression list is being rebuilt, retry shortly"), or too many large request bodies in flight (Retry-After: 5)
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -132,7 +133,7 @@ Only data inside the plan's log retention is visible. metadata may be null.
 - `not_found` (HTTP 404): email not found (events can take a few seconds to appear)
 
 ```bash
-curl 'https://api.zapsmtp.com/v1/emails/019a1f2e-7c3b-7d41-9a52-0c4b8e6f1a23' \
+curl 'https://app.zapsmtp.com/v1/emails/019a1f2e-7c3b-7d41-9a52-0c4b8e6f1a23' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -197,9 +198,11 @@ Billing, account settings and [team management](https://zapsmtp.com/docs/teams/)
 - [Received emails](https://zapsmtp.com/docs/receiving/): Read inbound email: bodies, headers, authentication results and attachments.
 - [Inbound setup](https://zapsmtp.com/docs/inbound/): Inbound addresses on managed or own domains, routing rules and stats.
 - [Suppressions](https://zapsmtp.com/docs/suppressions/): Addresses ZapSMTP will not send to: hard bounces, complaints, unsubscribes.
+- [Email validation](https://zapsmtp.com/docs/validation/): Check addresses before you send: domain, mail servers, throw-away and role addresses, typos and earlier bounces.
+- [Inbox placement](https://zapsmtp.com/docs/placement/): See whether a message lands in the inbox, a Gmail tab or spam at Gmail, Outlook, Yahoo and others.
 - [Statistics](https://zapsmtp.com/docs/stats/): Delivery totals, time series, provider / bounce breakdowns and metrics by domain, stream or tag.
 - [API keys & SMTP credentials](https://zapsmtp.com/docs/keys/): Create and revoke API keys and per-application SMTP credentials.
-- [Logs & usage](https://zapsmtp.com/docs/logs/): Every API request with its bodies, and this month’s usage against your plan.
+- [Logs, usage & account](https://zapsmtp.com/docs/logs/): Every API request with its bodies, this month’s usage against your plan, and the account itself.
 - [Simulator & dedicated IPs](https://zapsmtp.com/docs/platform/): Simulator addresses for testing and your dedicated sending IPs.
 
 ## Guides

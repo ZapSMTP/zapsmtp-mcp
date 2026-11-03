@@ -24,6 +24,8 @@ export const TOOLSETS: Toolset[] = [
   { name: 'usage', description: 'This month\'s usage and plan', default: true },
   { name: 'account', description: 'The account: plan and its limits, this month\'s sent count, SMTP settings; rename it', default: true },
   { name: 'simulator', description: 'Simulator addresses, and send_test_email to try any delivery outcome safely', default: true },
+  { name: 'email_validations', description: 'Validate addresses before sending: domain, mail servers, throw-away and role addresses, typos, earlier bounces', default: true },
+  { name: 'placement_tests', description: 'Inbox placement tests: where a message lands at Gmail, Outlook, Yahoo (inbox, tab or spam)', default: false },
   { name: 'inbound', description: 'Inbound domains, routes and forward destinations', default: false },
   { name: 'actions', description: 'Click actions (named buttons and links)', default: false },
   { name: 'template_modules', description: 'Reusable template modules', default: false },
@@ -46,7 +48,7 @@ export const toolName = (op: Operation): string => [...op.resource, op.method].m
 export const toolsetOf = (op: Operation): string => op.resource[0] === 'emails' && op.resource[1] === 'receiving' ? 'receiving' : snake(op.resource[0]);
 
 /** POST operations that change nothing: they compute an answer. */
-const READ_ONLY_POSTS = new Set(['templates.render', 'templates.renderSource', 'emails.spamCheck', 'emails.spamCheckSent']);
+const READ_ONLY_POSTS = new Set(['templates.render', 'templates.renderSource', 'emails.spamCheck', 'emails.spamCheckSent', 'emailValidations.create', 'emailValidations.createBatch']);
 /** Operations that destroy or revoke something besides DELETE requests. */
 const DESTRUCTIVE = new Set(['emails.cancel', 'webhooks.rotateSecret', 'suppressions.deleteBatch', 'templates.versions.restore']);
 /** POST operations that end in the same state when repeated. */
@@ -58,6 +60,7 @@ const IDEMPOTENT_POSTS = new Set([
 const OPEN_WORLD = new Set([
   'emails.send', 'emails.sendBatch', 'emails.receiving.reply', 'inbound.forwardDestinations.create',
   'inbound.forwardDestinations.resendConfirmation', 'webhooks.test', 'webhooks.events.replay', 'emails.receiving.redeliver',
+  'placementTests.create',
 ]);
 
 export interface Annotations {

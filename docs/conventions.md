@@ -4,7 +4,7 @@
 
 Source: https://zapsmtp.com/docs/conventions/
 
-The rules every endpoint shares. Base URL `https://api.zapsmtp.com/v1`, JSON in and out, timestamps in RFC 3339 (UTC), ids are time-ordered UUIDv7 strings.
+The rules every endpoint shares. Base URL `https://app.zapsmtp.com/v1`, JSON in and out, timestamps in RFC 3339 (UTC), ids are time-ordered UUIDv7 strings.
 
 ## API keys
 
@@ -14,7 +14,7 @@ Send the key as `Authorization: Bearer <key>`. The full key is shown once, when 
 
 - **`zap_…` (live)**: Delivers email. The From domain must be verified in your account.
 - **`zap_test_…` (test)**: Full validation, email log, events and webhooks, but nothing is delivered and the monthly quota is not charged (the per-second limit still applies). Any From domain is accepted. Events carry `test: true`; list them with `GET /emails?mode=test`.
-- **`full_access` (permission)**: Every endpoint.
+- **`full_access` (permission)**: Every endpoint of this reference, `GET` and `PATCH /account` included. Live keys only for changes (see test keys above). The signed-in person, billing and team management need a dashboard session (`403 session_required`).
 - **`sending_access` (permission)**: Only sending: `POST /emails`, `/emails/batch`, `/emails/spam-check`, rescheduling and canceling. Can also be limited to one domain and one stream.
 
 ## Errors
@@ -48,7 +48,7 @@ Errors use HTTP status codes and always carry both a flat shape (`statusCode`, `
 - **`test_key_restricted` (HTTP 403)**: A test key (`zap_test_…`) tried to change the account: test keys may send test email, render templates and read. Use a live key.
 - **`key_restricted` (HTTP 403)**: A restricted key creating or changing keys tried to give them more than it has: an expiry later than its own, or another stream.
 - **`email_unverified` (HTTP 403)**: Confirm your account email address first; we sent a link to it.
-- **`session_required` (HTTP 403)**: Team and account management needs a dashboard session, not an API key.
+- **`session_required` (HTTP 403)**: The signed-in person (`GET /me`), billing, and team and account management need a dashboard session, not an API key.
 - **`not_found` (HTTP 404)**: No such resource in your account (or outside your plan’s log retention).
 - **`method_not_allowed` (HTTP 405)**: The path exists, but not with this HTTP method.
 - **`idempotency_key_reused` (HTTP 409)**: The Idempotency-Key was used with a different body.
@@ -57,7 +57,7 @@ Errors use HTTP status codes and always carry both a flat shape (`statusCode`, `
 - **`conflict` (HTTP 409)**: The resource already exists.
 - **`not_ready` (HTTP 409)**: The received email is still being stored; retry the erasure in a few seconds.
 - **`link_expired` (HTTP 410)**: The download link has expired; request a new one from the API.
-- **`payload_too_large` (HTTP 413)**: Body over 40 MB.
+- **`payload_too_large` (HTTP 413)**: The body is over the endpoint’s size limit (see Limits).
 - **`misdirected_cell` (HTTP 421)**: Your account is served by another cell of ZapSMTP. The message names the cell and its URL, and the Zap-Cell header names the cell. Send to that URL; retrying here fails the same way.
 - **`missing_required_field` (HTTP 422)**: A required field is missing.
 - **`invalid_parameter` (HTTP 422)**: A field has an invalid value; the message says which.
@@ -100,7 +100,7 @@ Sending responses report your budget in headers. Back off on `429` and honor `Re
 
 - **Recipients per email**: 50 across to, cc and bcc
 - **Emails per batch**: 100
-- **Request size**: 40 MB, attachments included
+- **Request size**: Sends and replies: 40 MB, base64 attachments included. Templates (create, update): 4 MB. Rendering a saved template: 1 MB; rendering unsaved source: 2 MB. Over the limit: `413 payload_too_large`.
 - **Free plan**: 3,000 emails a month, at most 100 a day
 - **Spam checks**: 30 a minute per account
 
@@ -121,7 +121,9 @@ Lists return `{"object": "list", "has_more": false, "data": [...]}`, newest firs
 
 - `GET /emails` and `GET /emails/receiving`: `limit` 1–100 (default 20); pass the last id (or an RFC 3339 time) as `before` for older items, `after` for newer ones.
 - `GET /suppressions`: `limit` 1–1000 (default 100); pass `next_cursor` back as `after` while `has_more` is true.
-- Other lists return every item in one response.
+- `GET /logs`: `limit` 1–100 (default 20); pass the last log id as `before` for older entries, `after` for newer ones.
+- `GET /threads`: `limit` 1–100 (default 20); for the next page pass the last conversation’s `last_message_at` as `before` and its id as `before_id`. `GET /threads/{id}` returns up to 500 messages, oldest first, with `has_more`.
+- Lists that do not take `limit` return every item in one response; each endpoint’s page in this reference names its paging parameters.
 
 ## Email statuses
 

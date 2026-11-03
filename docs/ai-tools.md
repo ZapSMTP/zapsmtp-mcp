@@ -6,6 +6,8 @@ Source: https://zapsmtp.com/docs/ai-tools/
 
 Your coding assistant can work with ZapSMTP directly: send and inspect email through the MCP server, learn the API from Agent Skills and `llms.txt`, or drive everything from the command line.
 
+> The MCP server, the CLI and the skills are being published. [llms.txt](https://zapsmtp.com/llms.txt) and the Markdown pages are available now.
+
 - [MCP server](#mcp): Every API operation as a tool for Claude, Cursor, VS Code, Codex and any MCP client.
 - [Agent Skills](#skills): Instructions that teach coding agents to send, verify webhooks, use templates and migrate correctly.
 - [llms.txt](#llms): The docs for language models: an index, every page as Markdown and all of it in one file.
@@ -72,11 +74,9 @@ VS Code:
 ```
 
 - **Choose what it can do.** `--toolsets emails,templates,simulator` keeps only those groups; `--read-only` keeps only reads. Tools carry read-only and destructive hints for clients that ask before acting.
-- **Keep sends in bounds.** `--sender` sets the default From, and `--allowed-recipient-domains` refuses mail to any other domain. Sends carry an idempotency key, so a retried tool call never sends twice.
+- **Keep sends in bounds.** `--sender` sets the default From, and `--allowed-recipient-domains` refuses mail to any other domain. Retries inside one send reuse its idempotency key. To repeat a tool call safely, pass the same `idempotency_key` again: the second call returns the first result instead of sending (24 hours).
 - **Serve a team.** `--http` runs Streamable HTTP at `/mcp`, where every client brings its own `Authorization: Bearer` key and the server holds none.
 - **The docs come along.** `llms.txt` and every guide are bundled as MCP resources; nothing is fetched at runtime.
-
-Source and every flag: [github.com/ZapSMTP/zapsmtp-mcp](https://github.com/ZapSMTP/zapsmtp-mcp).
 
 ## Agent Skills
 
@@ -106,8 +106,6 @@ for s in zapsmtp-*/; do cp -R "$s" "$DEST/"; done
 
 For a tool without skills support, put the relevant `SKILL.md` in its instruction file, such as `AGENTS.md` or `.github/copilot-instructions.md`.
 
-Repository: [github.com/ZapSMTP/zapsmtp-skills](https://github.com/ZapSMTP/zapsmtp-skills).
-
 ## llms.txt and Markdown pages
 
 - [`/llms.txt`](https://zapsmtp.com/llms.txt): what ZapSMTP is, how to authenticate and test, then every docs page with a one-line description ([llmstxt.org](https://llmstxt.org)).
@@ -132,5 +130,3 @@ zapsmtp send --from "Acme <hello@acme.com>" --to jane@example.org \
 zapsmtp emails list --status bounced --all --json | jq '.data[].to'
 zapsmtp domains verify <domain-id>
 ```
-
-Source: [github.com/ZapSMTP/zapsmtp-cli](https://github.com/ZapSMTP/zapsmtp-cli).

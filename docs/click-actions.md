@@ -134,7 +134,7 @@ This endpoint receives `email.clicked` only for links marked `confirm_order`. Re
 Requires a full-access live key; test keys get 403 test_key_restricted.
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/webhooks' \
+curl -X POST 'https://app.zapsmtp.com/v1/webhooks' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -186,7 +186,7 @@ Requires a full-access live key; test keys get 403 test_key_restricted.
 - `id` (string, required): Webhook id
 
 ```bash
-curl -X PATCH 'https://api.zapsmtp.com/v1/webhooks/019a1c55-0d6e-7f21-8b3a-5e9d4c7b2a10' \
+curl -X PATCH 'https://app.zapsmtp.com/v1/webhooks/019a1c55-0d6e-7f21-8b3a-5e9d4c7b2a10' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -237,7 +237,7 @@ Every action the account declared, every action links named in the last 30 days,
 Requires a full-access key.
 
 ```bash
-curl 'https://api.zapsmtp.com/v1/actions' \
+curl 'https://app.zapsmtp.com/v1/actions' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -291,7 +291,7 @@ Optional: a link works with any valid name. Declaring one gives it a description
 Requires a full-access live key; test keys get 403 test_key_restricted.
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/actions' \
+curl -X POST 'https://app.zapsmtp.com/v1/actions' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{

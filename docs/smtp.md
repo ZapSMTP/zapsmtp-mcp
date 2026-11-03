@@ -176,7 +176,7 @@ swaks --server mail.zapsmtp.com:587 --tls \
 - **`550 5.1.1` (permanent)**: Every recipient is on your suppression list: nothing is sent.
 - **`535 5.7.8` (permanent)**: Authentication failed, or the credential was revoked or expired after you logged in (`Credentials no longer valid`).
 - **`451 4.7.0` (temporary)**: Over your per-second rate limit.
-- **`452 4.2.2` (temporary)**: Monthly or daily quota reached. The mailer keeps retrying, but nothing goes out until the quota resets or your plan changes.
+- **`452 4.2.2` (temporary)**: Monthly or daily quota reached, or (rarely) the shared IP pool’s warm-up limit for the day; the reply text says which. The mailer keeps retrying; a quota resets or your plan changes, the warm-up limit resets at 00:00 UTC.
 - **`452 4.5.3` (temporary)**: More than 50 recipients in one message. The extra recipients are refused; send them in another message.
 - **`451 4.3.1` (temporary)**: Server busy: too many large messages in flight.
 - **`451 4.3.0` (temporary)**: Overloaded, the MTA is briefly unavailable, or an internal error. Retry shortly.

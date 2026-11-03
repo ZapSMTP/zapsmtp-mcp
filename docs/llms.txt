@@ -2,7 +2,7 @@
 
 > Email API and SMTP relay: send, receive and track email.
 
-- Base URL: `https://api.zapsmtp.com/v1`. Authenticate with `Authorization: Bearer <API key>`; JSON in and out.
+- Base URL: `https://app.zapsmtp.com/v1`. Authenticate with `Authorization: Bearer <API key>`; JSON in and out.
 - Test keys (`zap_test_…`) run the whole pipeline without delivering anything; send to `delivered@simulator.zapsmtp.com` (and the other [simulator addresses](https://zapsmtp.com/docs/testing.md)) to see each outcome.
 - SDKs for Node.js, Python, PHP (and Laravel), Go, Ruby (and Rails), Java and .NET: https://zapsmtp.com/docs/sdks.md
 - Keep API keys on the server. Sends take an `Idempotency-Key`; retry 429 and 5xx answers with backoff, honouring `Retry-After`.
@@ -52,9 +52,11 @@
 - [Received emails](https://zapsmtp.com/docs/receiving.md): Read inbound email: bodies, headers, authentication results and attachments.
 - [Inbound setup](https://zapsmtp.com/docs/inbound.md): Inbound addresses on managed or own domains, routing rules and stats.
 - [Suppressions](https://zapsmtp.com/docs/suppressions.md): Addresses ZapSMTP will not send to: hard bounces, complaints, unsubscribes.
+- [Email validation](https://zapsmtp.com/docs/validation.md): Check addresses before you send: domain, mail servers, throw-away and role addresses, typos and earlier bounces.
+- [Inbox placement](https://zapsmtp.com/docs/placement.md): See whether a message lands in the inbox, a Gmail tab or spam at Gmail, Outlook, Yahoo and others.
 - [Statistics](https://zapsmtp.com/docs/stats.md): Delivery totals, time series, provider / bounce breakdowns and metrics by domain, stream or tag.
 - [Keys & SMTP credentials](https://zapsmtp.com/docs/keys.md): Create and revoke API keys and per-application SMTP credentials.
-- [Logs & usage](https://zapsmtp.com/docs/logs.md): Every API request with its bodies, and this month’s usage against your plan.
+- [Logs, usage & account](https://zapsmtp.com/docs/logs.md): Every API request with its bodies, this month’s usage against your plan, and the account itself.
 - [Simulator & IPs](https://zapsmtp.com/docs/platform.md): Simulator addresses for testing and your dedicated sending IPs.
 
 ## Optional
@@ -110,9 +112,14 @@
 - [Revoke an API key — API keys & SMTP credentials API](https://zapsmtp.com/docs/keys/revoke-api-key.md): Revoke an API key immediately.
 - [Revoke SMTP credentials — API keys & SMTP credentials API](https://zapsmtp.com/docs/keys/revoke-smtp-credential.md): Revoke an SMTP credential.
 - [Update an API key — API keys & SMTP credentials API](https://zapsmtp.com/docs/keys/update-api-key.md): Rename a key or change its permission and restrictions. The token and the mode never change; the new rights apply to the next request.
-- [Retrieve a log — Logs & usage API](https://zapsmtp.com/docs/logs/get-log.md): Retrieve one request with its request and response bodies. Bodies are capped at 16 KB; API keys, passwords and signing secrets are always replaced with [re
-- [List logs — Logs & usage API](https://zapsmtp.com/docs/logs/list-logs.md): List the API requests made with your keys, newest first. Bodies are on Retrieve a log. Entries appear within seconds and are kept for your plan’s log reten
-- [Retrieve usage — Logs & usage API](https://zapsmtp.com/docs/logs/usage.md): This month’s sending against your plan: emails sent, included volume, limit, overage and, on the Free plan, today’s count.
+- [Retrieve the account — Logs, usage & account API](https://zapsmtp.com/docs/logs/get-account.md): The account the key belongs to: its name, status and sending rate limit, the plan with its limits, this month’s sent count and the SMTP relay settings.
+- [Retrieve a log — Logs, usage & account API](https://zapsmtp.com/docs/logs/get-log.md): Retrieve one request with its request and response bodies. Bodies are capped at 16 KB; API keys, passwords and signing secrets are always replaced with [re
+- [List logs — Logs, usage & account API](https://zapsmtp.com/docs/logs/list-logs.md): List the API requests made with your keys, newest first. Bodies are on Retrieve a log. Entries appear within seconds and are kept for your plan’s log reten
+- [Rename the account — Logs, usage & account API](https://zapsmtp.com/docs/logs/update-account.md): Rename the account. Answers the account as GET /account does.
+- [Retrieve usage — Logs, usage & account API](https://zapsmtp.com/docs/logs/usage.md): This month’s sending against your plan: emails sent, included volume, limit, overage and, on the Free plan, today’s count.
+- [Start a placement test — Inbox placement API](https://zapsmtp.com/docs/placement/create-placement-test.md): Start an inbox placement test: see whether a message lands in the inbox, a Gmail tab or spam at the big mailbox providers.
+- [Retrieve a placement test — Inbox placement API](https://zapsmtp.com/docs/placement/get-placement-test.md): Retrieve a placement test with where each copy landed.
+- [List placement tests — Inbox placement API](https://zapsmtp.com/docs/placement/list-placement-tests.md): List placement tests, newest first, with cursor pagination.
 - [List dedicated IPs — Simulator & dedicated IPs API](https://zapsmtp.com/docs/platform/dedicated-ips.md): List the account's dedicated IPs with warm-up progress and current blocklist listings.
 - [List simulator addresses — Simulator & dedicated IPs API](https://zapsmtp.com/docs/platform/simulator.md): List the simulator addresses and the events each produces.
 - [Delete a received email — Received emails API](https://zapsmtp.com/docs/receiving/delete-received.md): Permanently erase a received email's content and metadata (GDPR erasure).
@@ -157,6 +164,8 @@
 - [Render a template — Templates API](https://zapsmtp.com/docs/templates/render-template.md): Preview a stored template with given variables (defaults to its sample variables).
 - [Restore a version — Templates API](https://zapsmtp.com/docs/templates/restore-template-version.md): Copy a version back into the draft. Publishing stays a separate step.
 - [Update a template — Templates API](https://zapsmtp.com/docs/templates/update-template.md): Update a template (partial).
+- [Validate an address — Email validation API](https://zapsmtp.com/docs/validation/validate-email.md): Check one address before you send to it: syntax, the domain and its mail servers, throw-away and role addresses, typos, your suppression list and earlier h
+- [Validate up to 100 addresses — Email validation API](https://zapsmtp.com/docs/validation/validate-emails.md): Check up to 100 addresses in one call; results come back in the order given.
 - [Delete a global variable — Variables API](https://zapsmtp.com/docs/variables/delete-global-variable.md): Delete a global variable. Sends with a template that still uses it then fail with 422 template_render_error until it is set again.
 - [List variables — Variables API](https://zapsmtp.com/docs/variables/list-variables.md): The variable catalogue: every variable the account’s templates can use, with where each is used. System variables first, then global ones, then template va
 - [Set a global variable — Variables API](https://zapsmtp.com/docs/variables/put-global-variable.md): Create or replace a global variable. Every template that uses it renders the new value from the next send on.

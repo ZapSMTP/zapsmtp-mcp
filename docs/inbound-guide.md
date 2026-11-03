@@ -55,7 +55,7 @@ Requires a full-access live key; test keys get 403 test_key_restricted.
 - `inbound_not_configured` (HTTP 503)
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/inbound/domains' \
+curl -X POST 'https://app.zapsmtp.com/v1/inbound/domains' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -105,7 +105,7 @@ Requires a full-access live key; test keys get 403 test_key_restricted.
 - `inbound_not_configured` (HTTP 503)
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/inbound/domains' \
+curl -X POST 'https://app.zapsmtp.com/v1/inbound/domains' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -167,7 +167,7 @@ Requires a full-access live key; test keys get 403 test_key_restricted.
 - `not_found` (HTTP 404): inbound domain not found
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/inbound/domains/019a1f21-5d6e-7f80-9a1b-2c3d4e5f6a7b/verify' \
+curl -X POST 'https://app.zapsmtp.com/v1/inbound/domains/019a1f21-5d6e-7f80-9a1b-2c3d4e5f6a7b/verify' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -250,7 +250,7 @@ Requires a full-access live key; test keys get 403 test_key_restricted.
 - `invalid_parameter` (HTTP 422): validation failures or "at most 100 routes per account"
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/inbound/routes' \
+curl -X POST 'https://app.zapsmtp.com/v1/inbound/routes' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -308,7 +308,7 @@ Requires a full-access live key; test keys get 403 test_key_restricted.
 - `invalid_parameter` (HTTP 422): validation failures or "at most 100 routes per account"
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/inbound/routes' \
+curl -X POST 'https://app.zapsmtp.com/v1/inbound/routes' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -365,7 +365,7 @@ Requires a full-access live key; test keys get 403 test_key_restricted.
 - `invalid_parameter` (HTTP 422): validation failures or "at most 100 routes per account"
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/inbound/routes' \
+curl -X POST 'https://app.zapsmtp.com/v1/inbound/routes' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -430,7 +430,7 @@ Any subset of the POST /inbound/routes fields. Omitted fields keep their value; 
 - `invalid_parameter` (HTTP 422)
 
 ```bash
-curl -X PATCH 'https://api.zapsmtp.com/v1/inbound/routes/019a1f31-0b2c-7d3e-8f4a-5b6c7d8e9f01' \
+curl -X PATCH 'https://app.zapsmtp.com/v1/inbound/routes/019a1f31-0b2c-7d3e-8f4a-5b6c7d8e9f01' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -487,7 +487,7 @@ The confirmation page asks for a click, so mail scanners that follow links canno
 - `service_unavailable` (HTTP 503): the destination was added but its confirmation email could not be sent; resend it
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/inbound/forward-destinations' \
+curl -X POST 'https://app.zapsmtp.com/v1/inbound/forward-destinations' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -535,7 +535,7 @@ Requires a full-access live key; test keys get 403 test_key_restricted.
 - `invalid_parameter` (HTTP 422): validation failures or "at most 100 routes per account"
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/inbound/routes' \
+curl -X POST 'https://app.zapsmtp.com/v1/inbound/routes' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -586,11 +586,12 @@ To send clicks of one button to this endpoint: `{"events": ["email.clicked"], "f
 ### Body parameters
 
 - `url` (string, required): Absolute https:// URL. Limits: 422 invalid_parameter "url must be an absolute https:// URL"
-- `events` (string[]): Limits: unknown type → 422 invalid_parameter "unknown event type <x>; allowed: ..." One of `email.sent`, `email.delivered`, `email.delivery_delayed`, `email.bounced`, `email.complained`, `email.failed`, `email.opened`, `email.clicked`, `email.suppressed`, `email.received`, `thread.created`, `thread.replied`, `email.replied`. Default `all event types`.
+- `events` (string[]): Limits: unknown type → 422 invalid_parameter "unknown event type <x>; allowed: ..." One of `email.sent`, `email.delivered`, `email.delivery_delayed`, `email.bounced`, `email.complained`, `email.failed`, `email.opened`, `email.clicked`, `email.suppressed`, `email.received`, `thread.created`, `thread.replied`, `email.replied`, `email.opened_unique`, `email.clicked_unique`, `email.unsubscribed`, `email.forward_failed`, `domain.verified`, `domain.reputation_changed`, `email.scheduled`, `suppression.added`, `suppression.removed`, `domain.created`, `domain.deleted`. Default `every type except email.opened_unique and email.clicked_unique`.
 - `include_content` (boolean): `email.received` carries the message: text, html, headers, and download links (valid 24 hours) for the attachments and the raw .eml; text and html are cut at 1 MB in total (`truncated: true`). Default `false`.
 - `batch` (boolean): Send events up to 100 per request (or every second) as a JSON array, signed as one body; `Zap-Event-Id` is the batch id, each event keeps its own `id`. `email.received` with the full message still arrives alone. Default `false`.
-- `filter` (object): Narrows `email.clicked` to some [click actions](https://zapsmtp.com/docs/click-actions/); other event types are not affected. Empty or absent: every click. Default `{"actions": []}`.
+- `filter` (object): Narrows what the endpoint receives: `actions` narrows `email.clicked` (and `email.clicked_unique`) to some [click actions](https://zapsmtp.com/docs/click-actions/); `domains` narrows every event to some domains. Empty or absent: every click, every domain. Default `{"actions": [], "domains": []}`.
   - `actions` (string[]): Action names (lowercase letters, digits, `_`, `.` and `-`, starting with a letter or digit, up to 64 characters). The endpoint then receives `email.clicked` only for links with one of these actions. Limits: more than 50 → 422 invalid_parameter "filter.actions: at most 50"; a bad name → 422 invalid_parameter "filter.actions: <name> is not an action name"
+  - `domains` (string[]): Sending or receiving domains (lower case). The endpoint then receives only events of these domains: the From domain of sent email, the receiving domain of received mail, the domain of `domain.*` events. Limits: more than 50 → 422 invalid_parameter "filter.actions and filter.domains: at most 50 each"; a bad name → 422 invalid_parameter "filter.domains: <name> is not a domain name"
 
 ### Errors
 
@@ -599,7 +600,7 @@ To send clicks of one button to this endpoint: `{"events": ["email.clicked"], "f
 - `invalid_parameter` (HTTP 422)
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/webhooks' \
+curl -X POST 'https://app.zapsmtp.com/v1/webhooks' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -631,7 +632,8 @@ curl -X POST 'https://api.zapsmtp.com/v1/webhooks' \
   "include_content": false,
   "batch": false,
   "filter": {
-    "actions": []
+    "actions": [],
+    "domains": []
   }
 }
 ```
@@ -733,12 +735,12 @@ The same event also carries the message. Text and HTML share a 1 MB budget after
       "content_disposition": "attachment",
       "content_id": null,
       "size": 48213,
-      "download_url": "https://api.zapsmtp.com/v1/files/eyJ0Ijoi....aGk",
+      "download_url": "https://app.zapsmtp.com/v1/files/eyJ0Ijoi....aGk",
       "expires_at": "2026-10-22T15:10:03Z"
     }
   ],
   "raw": {
-    "download_url": "https://api.zapsmtp.com/v1/files/eyJ0Ijoi....Qm9n",
+    "download_url": "https://app.zapsmtp.com/v1/files/eyJ0Ijoi....Qm9n",
     "expires_at": "2026-10-22T15:10:03Z"
   }
 }
@@ -789,7 +791,7 @@ Test events are not retried. delivery.error is present when the attempt failed (
 
 ### Body parameters
 
-- `type` (string): Limits: 422 invalid_parameter "unknown event type" One of `email.sent`, `email.delivered`, `email.delivery_delayed`, `email.bounced`, `email.complained`, `email.failed`, `email.opened`, `email.clicked`, `email.suppressed`, `email.received`, `thread.created`, `thread.replied`, `email.replied`. Default `email.delivered`.
+- `type` (string): Limits: 422 invalid_parameter "unknown event type" One of `email.sent`, `email.delivered`, `email.delivery_delayed`, `email.bounced`, `email.complained`, `email.failed`, `email.opened`, `email.clicked`, `email.suppressed`, `email.received`, `thread.created`, `thread.replied`, `email.replied`, `email.opened_unique`, `email.clicked_unique`, `email.unsubscribed`, `email.forward_failed`, `domain.verified`, `domain.reputation_changed`, `email.scheduled`, `suppression.added`, `suppression.removed`, `domain.created`, `domain.deleted`. Default `email.delivered`.
 
 ### Errors
 
@@ -799,7 +801,7 @@ Test events are not retried. delivery.error is present when the attempt failed (
 - `invalid_parameter` (HTTP 422)
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/webhooks/019a1f22-6e7f-7091-8a2b-3c4d5e6f7a8b/test' \
+curl -X POST 'https://app.zapsmtp.com/v1/webhooks/019a1f22-6e7f-7091-8a2b-3c4d5e6f7a8b/test' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -869,6 +871,8 @@ Requires a full-access key.
 
 `tls`: the TLS version the sending server used (e.g. `TLSv1_3`); empty when the message was not encrypted.
 
+A message refused at SMTP (`status: rejected`: spam or a `reject` route) is listed but its content was never kept: it returns the listing fields, with `html`, `text` and `raw` null and `headers` empty. Its attachments, redelivery, spam reports and replies are 404; DELETE erases it.
+
 ### Path parameters
 
 - `id` (string (UUID), required): Received email id
@@ -884,7 +888,7 @@ Requires a full-access key.
 - `inbound_not_configured` (HTTP 503)
 
 ```bash
-curl 'https://api.zapsmtp.com/v1/emails/receiving/019a1f30-1d4e-7a6b-8c2d-3e4f5a6b7c8d' \
+curl 'https://app.zapsmtp.com/v1/emails/receiving/019a1f30-1d4e-7a6b-8c2d-3e4f5a6b7c8d' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -1011,7 +1015,7 @@ Requires a full-access key.
 
 ### Query parameters
 
-- `limit` (integer): 1-100; out-of-range falls back to 20. Default `20`.
+- `limit` (integer): 1-100. Limits: 422 invalid_parameter otherwise. Default `20`.
 - `before` (string): Cursor: an email id or RFC 3339 time; returns messages received before it. An email id gives an exact page boundary. Limits: 422 invalid_parameter "before must be an email id or RFC 3339 time"
 - `after` (string): Email id or RFC 3339 time. Limits: 422 invalid_parameter "after must be an email id or RFC 3339 time"
 - `q` (string): Case-insensitive substring of sender, recipient or subject, or an exact id.
@@ -1027,7 +1031,7 @@ Requires a full-access key.
 - `inbound_not_configured` (HTTP 503): inbound email is not enabled on this deployment
 
 ```bash
-curl 'https://api.zapsmtp.com/v1/emails/receiving?automated=false&domain=acme.com&limit=20' \
+curl 'https://app.zapsmtp.com/v1/emails/receiving?automated=false&domain=acme.com&limit=20' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -1098,7 +1102,7 @@ Each `download_url` works for one hour without an API key. Files are always serv
 
 ### Query parameters
 
-- `limit` (integer): 1-100; when omitted or out of range all attachments are returned.
+- `limit` (integer): 1-100; when omitted all attachments are returned. Limits: 422 invalid_parameter otherwise.
 - `after` (string): Attachment id; returns attachments after it (ignored if unknown).
 - `before` (string): Attachment id; returns attachments before it (used only when after is absent).
 
@@ -1107,9 +1111,10 @@ Each `download_url` works for one hour without an API key. Files are always serv
 - `restricted_api_key` (HTTP 403)
 - `not_found` (HTTP 404): email not found
 - `inbound_not_configured` (HTTP 503)
+- `invalid_parameter` (HTTP 422): a query parameter is out of range or not one of its values
 
 ```bash
-curl 'https://api.zapsmtp.com/v1/emails/receiving/019a1f30-1d4e-7a6b-8c2d-3e4f5a6b7c8d/attachments' \
+curl 'https://app.zapsmtp.com/v1/emails/receiving/019a1f30-1d4e-7a6b-8c2d-3e4f5a6b7c8d/attachments' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -1171,7 +1176,7 @@ Shell:
 
 ```
 # the original message, byte for byte, as an .eml file
-curl -s 'https://api.zapsmtp.com/v1/emails/receiving/019a1f30-1d4e-7a6b-8c2d-3e4f5a6b7c8d' \
+curl -s 'https://app.zapsmtp.com/v1/emails/receiving/019a1f30-1d4e-7a6b-8c2d-3e4f5a6b7c8d' \
   -H "Authorization: Bearer $ZAP_API_KEY" | jq -r .raw.download_url \
   | xargs curl -s -o message.eml
 ```
@@ -1205,11 +1210,11 @@ A conversation you started (your first email) is counted once the customer answe
 
 ### Query parameters
 
-- `limit` (integer): 1-100; out-of-range falls back to 20. Default `20`.
+- `limit` (integer): 1-100. Limits: 422 invalid_parameter otherwise. Default `20`.
 - `before` (string): Cursor: the `last_message_at` of the last conversation you have (RFC 3339). Limits: 422 invalid_parameter otherwise.
 - `before_id` (string): With before: the id of the last conversation you have, so conversations active at the same instant are neither skipped nor repeated.
-- `awaiting_reply` (boolean): `true`: only conversations whose last human email came in.
-- `unread` (boolean): `true`: only conversations with an email received after their read mark.
+- `awaiting_reply` (boolean): `true`: only conversations whose last human email came in. Limits: 422 invalid_parameter unless true or false.
+- `unread` (boolean): `true`: only conversations with an email received after their read mark. Limits: 422 invalid_parameter unless true or false.
 - `participant` (string): Only conversations this address took part in (case-insensitive).
 
 ### Errors
@@ -1218,7 +1223,7 @@ A conversation you started (your first email) is counted once the customer answe
 - `invalid_parameter` (HTTP 422): before must be an RFC 3339 time
 
 ```bash
-curl 'https://api.zapsmtp.com/v1/threads?awaiting_reply=true&limit=25' \
+curl 'https://app.zapsmtp.com/v1/threads?awaiting_reply=true&limit=25' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -1287,7 +1292,7 @@ Emails received before 2026-10-23 have a thread id but are not listed here.
 - `not_found` (HTTP 404): thread not found (or past your plan's log retention)
 
 ```bash
-curl 'https://api.zapsmtp.com/v1/threads/3f1c9a52-6b0e-5d4f-8a71-2c9e0b4d6f13' \
+curl 'https://app.zapsmtp.com/v1/threads/3f1c9a52-6b0e-5d4f-8a71-2c9e0b4d6f13' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -1394,7 +1399,7 @@ Omitted fields are kept.
 - `invalid_parameter` (HTTP 422): metadata limits
 
 ```bash
-curl -X PATCH 'https://api.zapsmtp.com/v1/threads/3f1c9a52-6b0e-5d4f-8a71-2c9e0b4d6f13' \
+curl -X PATCH 'https://app.zapsmtp.com/v1/threads/3f1c9a52-6b0e-5d4f-8a71-2c9e0b4d6f13' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -1491,7 +1496,7 @@ Loop protection: replies to automated email need `allow_automated`, and one conv
 - `reply_to` (string | string[]): Default: the receiving address when you reply from another one, so the customer's answer comes back to the same inbox.
 - `subject` (string): Default: `Re: ` + the email's subject (kept as is when it already starts with Re:).
 - `headers` (object): Custom headers. `In-Reply-To` and `References` are set for you (RFC 5322 threading); a value you give wins.
-- `attachments, tags, metadata, stream, tracking, template, scheduled_at`: As in [POST /emails](https://zapsmtp.com/docs/emails/send-email/).
+- `attachments, tags, metadata, stream, tracking, template, scheduled_at, tls`: As in [POST /emails](https://zapsmtp.com/docs/emails/send-email/).
 
 ### Errors
 
@@ -1509,7 +1514,7 @@ Loop protection: replies to automated email need `allow_automated`, and one conv
 - `inbound_not_configured` (HTTP 503)
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails/receiving/019a1f30-1d4e-7a6b-8c2d-3e4f5a6b7c8d/reply' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails/receiving/019a1f30-1d4e-7a6b-8c2d-3e4f5a6b7c8d/reply' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Idempotency-Key: reply-T-1042-1' \
   -H 'Content-Type: application/json' \
@@ -1568,7 +1573,7 @@ Reply tracking: each tracked email gets its own signed Reply-To, e.g. `r1-<email
 - `invalid_parameter` (HTTP 422): bad tls; reply_domain not one of your inbound domains, not this domain or a subdomain of it, or without a verified MX record; reply_forward_to not a plain address, a receiving address, or not on a verified domain / confirmed forward destination; reply_tracking without a reply_domain
 
 ```bash
-curl -X PATCH 'https://api.zapsmtp.com/v1/domains/019a1e9b-41c2-7a0e-b5d1-3f6c2e8a9d47' \
+curl -X PATCH 'https://app.zapsmtp.com/v1/domains/019a1e9b-41c2-7a0e-b5d1-3f6c2e8a9d47' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -1661,7 +1666,7 @@ Each account has its own statistics: your reports never change another account's
 - `service_unavailable` (HTTP 503): The spam filter could not learn right now; retry.
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails/receiving/019a1f30-1d4e-7a6b-8c2d-3e4f5a6b7c8d/spam' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails/receiving/019a1f30-1d4e-7a6b-8c2d-3e4f5a6b7c8d/spam' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -1704,7 +1709,7 @@ Requires a full-access live key; test keys get 403 test_key_restricted.
 - `not_found` (HTTP 404): inbound domain not found
 
 ```bash
-curl -X PATCH 'https://api.zapsmtp.com/v1/inbound/domains/019a1f21-5d6e-7f80-9a1b-2c3d4e5f6a7b' \
+curl -X PATCH 'https://app.zapsmtp.com/v1/inbound/domains/019a1f21-5d6e-7f80-9a1b-2c3d4e5f6a7b' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -1764,7 +1769,7 @@ The event is re-queued asynchronously (hence 202).
 - `inbound_not_configured` (HTTP 503)
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails/receiving/019a1f30-1d4e-7a6b-8c2d-3e4f5a6b7c8d/redeliver' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails/receiving/019a1f30-1d4e-7a6b-8c2d-3e4f5a6b7c8d/redeliver' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -1801,7 +1806,7 @@ Idempotent: deleting an id that does not exist (but is a valid UUID) still retur
 - `inbound_not_configured` (HTTP 503)
 
 ```bash
-curl -X DELETE 'https://api.zapsmtp.com/v1/emails/receiving/019a1f30-1d4e-7a6b-8c2d-3e4f5a6b7c8d' \
+curl -X DELETE 'https://app.zapsmtp.com/v1/emails/receiving/019a1f30-1d4e-7a6b-8c2d-3e4f5a6b7c8d' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -1848,7 +1853,7 @@ import crypto from 'node:crypto';
 import express from 'express';
 import { db } from './db.js'; // your storage
 
-const API = 'https://api.zapsmtp.com/v1';
+const API = 'https://app.zapsmtp.com/v1';
 
 async function zap(method, path, body, idempotencyKey) {
   const headers = { Authorization: 'Bearer ' + process.env.ZAP_API_KEY };
@@ -1914,7 +1919,7 @@ import requests
 from flask import Flask, request
 from myapp import db  # your storage
 
-API = "https://api.zapsmtp.com/v1"
+API = "https://app.zapsmtp.com/v1"
 app = Flask(__name__)
 
 def zap(method, path, body=None, idempotency_key=None):
@@ -1991,7 +1996,7 @@ import (
 	"time"
 )
 
-const api = "https://api.zapsmtp.com/v1"
+const api = "https://app.zapsmtp.com/v1"
 
 type received struct {
 	Type string `json:"type"`
@@ -2124,7 +2129,7 @@ PHP:
 // your storage: $db->seen(), ticketByThread(), createTicket(), addMessage(), markSeen()
 require __DIR__ . '/db.php';
 
-const API = 'https://api.zapsmtp.com/v1';
+const API = 'https://app.zapsmtp.com/v1';
 
 function zap(string $method, string $path, ?array $body = null, ?string $idemKey = null): array {
     $headers = ['Authorization: Bearer ' . getenv('ZAP_API_KEY'), 'Content-Type: application/json'];

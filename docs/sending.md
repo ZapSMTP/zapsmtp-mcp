@@ -6,7 +6,7 @@ Source: https://zapsmtp.com/docs/sending/
 
 Everything [POST /emails](https://zapsmtp.com/docs/emails/send-email/) can do, with a working example for each. The examples send to the simulator: paste a test key and press **Try it** (the attachment-by-URL example points at a placeholder URL and has no Try it). Field names follow Resend, so an existing Resend integration only needs a new base URL and key.
 
-> Base URL `https://api.zapsmtp.com/v1`. Send `Authorization: Bearer <key>` and a JSON body. Unknown fields are rejected with `400 validation_error`, so a misspelled field name is not silently ignored. The whole request, attachments included, may be up to 40 MB.
+> Base URL `https://app.zapsmtp.com/v1`. Send `Authorization: Bearer <key>` and a JSON body. Unknown fields are rejected with `400 validation_error`, so a misspelled field name is not silently ignored. The whole request, attachments included, may be up to 40 MB.
 
 ## Senders and recipients
 
@@ -30,7 +30,7 @@ One email to several recipients is one message: everyone sees the same `To` and 
 `to`, `cc`, `bcc` and `reply_to` take a string or an array; `from` takes one string. Display names are optional; Bcc recipients get the email but are not written into its headers.
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -74,7 +74,7 @@ Send `html`, `text` or both; at least one is required (`422 missing_required_fie
 Omit `html` and the email goes out as a single `text/plain` part.
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -100,7 +100,7 @@ curl -X POST 'https://api.zapsmtp.com/v1/emails' \
 With both bodies the email is `multipart/alternative`: clients that cannot show HTML show the text.
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -203,7 +203,7 @@ attachment = {
 Put the file in `content` as standard base64 (with padding). `content_type` is optional: it is detected from the file name.
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -238,7 +238,7 @@ curl -X POST 'https://api.zapsmtp.com/v1/emails' \
 Set `path` instead of `content` and we download the file when you send. Without a `filename`, the last segment of the URL is used.
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -272,7 +272,7 @@ curl -X POST 'https://api.zapsmtp.com/v1/emails' \
 Give the attachment a `content_id` and reference it from the HTML as `cid:<content_id>`. The image travels with the email, so it shows even when the client blocks remote images.
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -318,7 +318,7 @@ Setting `In-Reply-To` and `References` to the `Message-ID` of the email you answ
 Header names are printable ASCII without spaces or colons; values may contain any text and are encoded for you.
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -360,7 +360,7 @@ Invalid tags or metadata return `422 invalid_parameter`.
 Tags group email in metrics; metadata ties an email to your own records. Both come back on the email’s delivery webhooks; see the table above for the exceptions.
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -406,7 +406,7 @@ Exact match on a metadata value. Repeat the parameter to match several keys.
 - `metadata[order_id]` (string): Exact match on the `order_id` metadata value.
 
 ```bash
-curl 'https://api.zapsmtp.com/v1/emails?metadata%5Border_id%5D=A-1042' \
+curl 'https://app.zapsmtp.com/v1/emails?metadata%5Border_id%5D=A-1042' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -459,7 +459,7 @@ Use a key that names the email in your system, such as `order-1042-receipt`, not
 Derive the key from your own record, so every retry of the same email carries the same key.
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Idempotency-Key: order-1042-receipt' \
   -H 'Content-Type: application/json' \
@@ -503,7 +503,7 @@ While it waits, `GET /emails/{id}` returns `status: "scheduled"` with its `sched
 The response returns the id at once; nothing is sent until the time comes.
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -537,7 +537,7 @@ Only `scheduled_at` can change. The new time follows the same rules as when sche
 - `id` (string, required): Scheduled email id
 
 ```bash
-curl -X PATCH 'https://api.zapsmtp.com/v1/emails/019a1f40-2b3c-7d4e-8f5a-6b7c8d9e0f12' \
+curl -X PATCH 'https://app.zapsmtp.com/v1/emails/019a1f40-2b3c-7d4e-8f5a-6b7c8d9e0f12' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -574,7 +574,7 @@ The email is never sent and its status becomes `canceled`.
 - `id` (string, required): Scheduled email id
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails/019a1f40-2b3c-7d4e-8f5a-6b7c8d9e0f12/cancel' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails/019a1f40-2b3c-7d4e-8f5a-6b7c8d9e0f12/cancel' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -606,7 +606,7 @@ A `200` response holds `data`, one `{index, id}` per accepted email (plus `suppr
 Up to 100 emails in one request. Each item is a complete email and may use its own sender, stream or `scheduled_at`.
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails/batch' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails/batch' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Idempotency-Key: digest-2026-10-26-chunk-1' \
   -H 'Content-Type: application/json' \
@@ -667,7 +667,7 @@ curl -X POST 'https://api.zapsmtp.com/v1/emails/batch' \
 With `x-batch-validation: permissive` the valid emails are sent and each invalid one is reported by its index.
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails/batch' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails/batch' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'x-batch-validation: permissive' \
   -H 'Content-Type: application/json' \
@@ -740,7 +740,7 @@ A broadcast email to a single recipient gets RFC 8058 one-click unsubscribe head
 Marketing and bulk mail goes on `broadcast`. The one-click unsubscribe headers are added for you; the body link below is optional.
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -777,7 +777,7 @@ Keys that start with `zap_test_` go through the same validation, email log, even
 One request, three outcomes: each simulator recipient produces its own events and webhooks within seconds.
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -825,7 +825,7 @@ Per-recipient status and the full event timeline, including the receiving server
 - `id` (string, required): Email id
 
 ```bash
-curl 'https://api.zapsmtp.com/v1/emails/019a1f2e-7c3b-7d41-9a52-0c4b8e6f1a23' \
+curl 'https://app.zapsmtp.com/v1/emails/019a1f2e-7c3b-7d41-9a52-0c4b8e6f1a23' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -901,7 +901,7 @@ The per-second limit counts recipients across all your requests. If you send in 
 Node.js:
 
 ```javascript
-const API = 'https://api.zapsmtp.com/v1';
+const API = 'https://app.zapsmtp.com/v1';
 // Safe to repeat with the same Idempotency-Key: the email is sent at most once.
 const RETRYABLE = new Set(['rate_limit_exceeded', 'overloaded', 'idempotency_request_in_progress', 'internal_error', 'service_unavailable']);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -940,7 +940,7 @@ Python:
 ```python
 import os, time, requests
 
-API = "https://api.zapsmtp.com/v1"
+API = "https://app.zapsmtp.com/v1"
 RETRYABLE = {"rate_limit_exceeded", "overloaded", "idempotency_request_in_progress", "internal_error", "service_unavailable"}
 
 def send(email: dict, idempotency_key: str) -> dict:

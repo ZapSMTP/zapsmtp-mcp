@@ -22,9 +22,20 @@ Add endpoints under Webhooks in the dashboard: send a test event, watch every de
 - **`email.clicked`**: A tracked link was clicked (click tracking on, or a link with a click action).
 - **`email.suppressed`**: Not sent: the recipient is on your suppression list.
 - **`email.received`**: An inbound email arrived. Metadata only, unless the endpoint has include_content: then text, html, headers and 24-hour download links for attachments and the raw message (cut at 1 MB, truncated: true).
-- **`thread.created`**: A new conversation: a received email that answers nothing. Not sent for automated mail.
+- **`thread.created`**: A new conversation: a received email that answers nothing. Not sent for redeliveries or for bounces, out-of-office and other auto-replies; list mail (bulk) is included.
 - **`thread.replied`**: A customer answered in a conversation. Not sent for auto-replies, bounces and notifications.
 - **`email.replied`**: Someone answered an email sent with reply tracking. Sent for every tracked reply, automated ones included; data.reply.type tells them apart.
+- **`email.opened_unique`**: The first open of an email by its recipient: the same data as that email.opened, sent once. Not in the default list: choose it.
+- **`email.clicked_unique`**: The first click in an email by its recipient (any link): the same data as that email.clicked, sent once. Not in the default list: choose it.
+- **`email.unsubscribed`**: A recipient unsubscribed with the link or one-click unsubscribe; they are on your suppression list from now on. data: email_id, to, tags, metadata, stream.
+- **`email.forward_failed`**: A received email that a route forwards could not be forwarded. data: email_id (the received email), to, forward_id, reason (destination, gone, loop, seal, retries), error.
+- **`domain.verified`**: A sending domain passed verification for the first time. data: domain_id, domain, dkim_verified, spf_verified, dmarc_verified.
+- **`domain.reputation_changed`**: A sending domain was listed on, or removed from, a blocklist. data: domain_id, domain, list, listed, severity (critical, high, policy), removal_url.
+- **`email.scheduled`**: An email was scheduled for later, or moved to another time; one event per recipient. data: email_id, from, to, subject, tags, metadata, stream, scheduled_at.
+- **`suppression.added`**: An address went on your suppression list: a hard bounce, a complaint, an unsubscribe, or you added it. data: email, reason (hard_bounce, complaint, unsubscribe, manual), source_id (the email that caused it).
+- **`suppression.removed`**: An address came off your suppression list. data: email.
+- **`domain.created`**: A sending domain was added. data: domain_id, domain.
+- **`domain.deleted`**: A sending domain was removed. data: domain_id, domain.
 
 ## Payload
 
@@ -96,7 +107,9 @@ An `email.clicked` event:
 }
 ```
 
-An endpoint with `filter.actions` receives `email.clicked` only for those actions; see [Send actions to their own endpoints](https://zapsmtp.com/docs/click-actions/#webhooks).
+An endpoint with `filter.actions` receives `email.clicked` (and `email.clicked_unique`) only for those actions; see [Send actions to their own endpoints](https://zapsmtp.com/docs/click-actions/#webhooks). With `filter.domains` it receives only the events of those domains: the From domain of sent email, the receiving domain of received mail, the domain of `domain.*` events (an agency gives each client's domains their own endpoint).
+
+`email.unsubscribed`, `email.scheduled`, `email.forward_failed`, `suppression.*` and `domain.*` are not tied to a delivery attempt: their `data` is listed in the table above. `email.complained` carries `complaint`: `type` (the ARF feedback type, usually `abuse`) and `source`, the mailbox provider's feedback loop that reported it.
 
 **Headers**
 
@@ -243,4 +256,4 @@ How fast ZapSMTP sends adapts to your endpoint. Requests in flight start at 32. 
 
 ## Retries
 
-Network errors, timeouts, 5xx, 408 and 429 are retried after 5 s, 5 min, 30 min, 2 h, 5 h, 10 h and 10 h — eight attempts over about 28 hours. Other 4xx answers are final. An endpoint that keeps failing is paused for a minute without losing attempts, and is disabled if five events exhaust their retries within 24 hours (re-enable it with [PATCH](https://zapsmtp.com/docs/webhooks/update-webhook/)). The last 100 attempts are kept: [list them](https://zapsmtp.com/docs/webhooks/webhook-deliveries/) and [replay](https://zapsmtp.com/docs/webhooks/replay-event/) any event.
+Network errors, timeouts, 5xx, 408 and 429 are retried after 5 s, 5 min, 30 min, 2 h, 5 h, 10 h and 10 h — eight attempts over about 28 hours. Other 4xx answers are final. An endpoint that keeps failing is paused for a minute without losing attempts, and is disabled if five events exhaust their retries within 24 hours (re-enable it with [PATCH](https://zapsmtp.com/docs/webhooks/update-webhook/)). The last 100 attempts are kept: [list them](https://zapsmtp.com/docs/webhooks/webhook-deliveries/) and [replay](https://zapsmtp.com/docs/webhooks/replay-event/) any event. Owners and admins get an email when that happens.

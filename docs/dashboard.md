@@ -60,6 +60,24 @@ Hard bounces, spam complaints and unsubscribes are added automatically, so you n
 
 ![The suppression list with hard bounces, an unsubscribe and a complaint, each with its source](https://zapsmtp.com/docs/img/suppressions-light.webp)
 
+## Account and security settings
+
+In Settings, rename the account, change your password or *Sign out everywhere*. A new password needs at least 10 characters; changing it signs out your other devices and keeps this one. *Sign out everywhere* ends every dashboard session, this one included. Each password change is confirmed by email.
+
+## Promo codes
+
+An owner enters a promo code in Plan & billing, under *Promo code*. A code for a free plan switches the account to it at once; a code for a paid plan adds that plan to the list to choose and pay for. If the account pays for a plan now, cancel it in *Manage billing* first, then enter the code again.
+
+On the Free plan and on plans that come with a promo code, every email the account sends ends with a small “Sent with ZapSMTP” line with our logo, and it cannot be removed. Paid plans send your email as it is.
+
+## Delete an account
+
+An owner can delete the account in Settings: type its name and your password. Sending stops at once (API, SMTP, scheduled emails and forwarding answer `403 account_closing`), every member gets an email (and a reminder 3 days before the end), and for 7 days an owner can cancel it in Settings and carry on as before.
+
+After 7 days everything in the account is erased for good: email logs and stored messages, received mail and attachments, templates and images, domains and their DKIM keys, API keys and SMTP credentials, webhooks, suppressions and the team. A paid plan ends with a final invoice. People who belonged to no other account are removed as well. Other accounts you belong to are not touched.
+
+Accounts are also deleted when they are abandoned: a Free account that nobody used for 30 days (no sign-in, API request or SMTP login), and an account whose payment has been overdue for 30 days. Every member gets an email 14 days before and a last one 3 days before, and sending keeps working meanwhile. Using the account cancels the first; paying the overdue invoice cancels the second.
+
 ## On your phone
 
 The whole dashboard works on a phone: lists become cards, and the template editor edits in the mobile view with its panels as sheets.

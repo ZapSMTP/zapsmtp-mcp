@@ -118,7 +118,7 @@ Reply tracking: each tracked email gets its own signed Reply-To, e.g. `r1-<email
 - `invalid_parameter` (HTTP 422): bad tls; reply_domain not one of your inbound domains, not this domain or a subdomain of it, or without a verified MX record; reply_forward_to not a plain address, a receiving address, or not on a verified domain / confirmed forward destination; reply_tracking without a reply_domain
 
 ```bash
-curl -X PATCH 'https://api.zapsmtp.com/v1/domains/019a1e9b-41c2-7a0e-b5d1-3f6c2e8a9d47' \
+curl -X PATCH 'https://app.zapsmtp.com/v1/domains/019a1e9b-41c2-7a0e-b5d1-3f6c2e8a9d47' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -213,7 +213,7 @@ With reply tracking on, the response carries `reply_to`: the tracked address the
 - `text` (string): Plain-text body. When only `html` is given, a plain-text part is generated from it (readable text, links as `text (url)`, hidden elements such as the preheader left out).
 - `headers` (object<string,string>): Custom headers. Limits: Reserved headers are rejected (422 invalid_parameter "header ... cannot be set"): From, To, Cc, Bcc, Reply-To, Subject, Date, Message-Id, Mime-Version, Content-Type, Content-Transfer-Encoding, DKIM-Signature, Return-Path, Received, any X-Zap-*, X-ZapRef. Names must be printable ASCII without spaces or ':'.
 - `attachments` (object[]): Attachments; 40 MB total. Limits: 422 invalid_attachment with message attachments[i]: set either content or path, not both | content must be base64 | content or path is required | filename is required | path must be an http(s) URL | fetching path returned HTTP <n> | attachments exceed 40MB in total
-  - `filename` (string, required): File name shown to the recipient.
+  - `filename` (string): File name shown to the recipient. Required with `content`; with `path` it defaults to the last segment of the URL.
   - `content` (string): File content, base64-encoded. Set `content` or `path`, not both.
   - `path` (string): An HTTPS URL we download the file from instead (private and internal addresses are refused).
   - `content_type` (string): MIME type. Detected from the file name when omitted.
@@ -231,7 +231,7 @@ With reply tracking on, the response carries `reply_to`: the tracked address the
 - `template` (object): Render a stored, published template: id = template id or alias. Request subject/from override the template's. Cannot be combined with html/text. Limits: missing id → 422 missing_required_field "template.id is required"; unknown → 422 invalid_parameter "template <id> not found"; never published → 422 invalid_parameter; `variables.global` → 422 invalid_parameter (reserved); a value of the wrong type → 422 template_variables_invalid; a required variable without value or default → 422 template_variables_missing; anything else the template uses still absent → 422 template_render_error "missing template variables: a, b"
   - `id` (string, required): Template id or alias. The template must be published.
   - `variables` (object): Values for the template’s own variables. Checked against the published [variable schema](https://zapsmtp.com/docs/templating/#schema): defaults fill absent values, optional variables without one render empty, names the schema does not declare are passed through. `global` is reserved: global variables come from the account.
-- `tls` (string): `required` or `verified`: deliver only over TLS (`verified`: with a valid certificate for the receiving server). Raises the domain's policy, never lowers it.
+- `tls` (string): `opportunistic`, `required` or `verified`: `required` delivers only over TLS, `verified` only with a valid certificate for the receiving server. The stricter of this and the domain’s policy applies: it raises the domain’s policy, never lowers it.
 
 ### Errors
 
@@ -240,6 +240,7 @@ With reply tracking on, the response carries `reply_to`: the tracked address the
 - `domain_not_verified` (HTTP 403): sender domain is not verified for this account
 - `restricted_api_key` (HTTP 403): key restricted to another domain or stream
 - `account_suspended` (HTTP 403): account is suspended
+- `account_closing` (HTTP 403): account is scheduled for deletion (an owner can cancel it in the dashboard)
 - `idempotency_key_reused` (HTTP 409)
 - `idempotency_request_in_progress` (HTTP 409)
 - `payload_too_large` (HTTP 413): request body exceeds 40MB
@@ -258,7 +259,7 @@ With reply tracking on, the response carries `reply_to`: the tracked address the
 - `service_unavailable` (HTTP 503): a backing store failing over ("a backing service is failing over; retry shortly", Retry-After: 2); MTA unreachable ("mail transfer agent temporarily unavailable, retry"), suppression list being rebuilt ("suppression list is being rebuilt, retry shortly"), or too many large request bodies in flight (Retry-After: 5)
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -326,7 +327,7 @@ With reply tracking on, the response carries `reply_to`: the tracked address the
 - `text` (string): Plain-text body. When only `html` is given, a plain-text part is generated from it (readable text, links as `text (url)`, hidden elements such as the preheader left out).
 - `headers` (object<string,string>): Custom headers. Limits: Reserved headers are rejected (422 invalid_parameter "header ... cannot be set"): From, To, Cc, Bcc, Reply-To, Subject, Date, Message-Id, Mime-Version, Content-Type, Content-Transfer-Encoding, DKIM-Signature, Return-Path, Received, any X-Zap-*, X-ZapRef. Names must be printable ASCII without spaces or ':'.
 - `attachments` (object[]): Attachments; 40 MB total. Limits: 422 invalid_attachment with message attachments[i]: set either content or path, not both | content must be base64 | content or path is required | filename is required | path must be an http(s) URL | fetching path returned HTTP <n> | attachments exceed 40MB in total
-  - `filename` (string, required): File name shown to the recipient.
+  - `filename` (string): File name shown to the recipient. Required with `content`; with `path` it defaults to the last segment of the URL.
   - `content` (string): File content, base64-encoded. Set `content` or `path`, not both.
   - `path` (string): An HTTPS URL we download the file from instead (private and internal addresses are refused).
   - `content_type` (string): MIME type. Detected from the file name when omitted.
@@ -344,7 +345,7 @@ With reply tracking on, the response carries `reply_to`: the tracked address the
 - `template` (object): Render a stored, published template: id = template id or alias. Request subject/from override the template's. Cannot be combined with html/text. Limits: missing id → 422 missing_required_field "template.id is required"; unknown → 422 invalid_parameter "template <id> not found"; never published → 422 invalid_parameter; `variables.global` → 422 invalid_parameter (reserved); a value of the wrong type → 422 template_variables_invalid; a required variable without value or default → 422 template_variables_missing; anything else the template uses still absent → 422 template_render_error "missing template variables: a, b"
   - `id` (string, required): Template id or alias. The template must be published.
   - `variables` (object): Values for the template’s own variables. Checked against the published [variable schema](https://zapsmtp.com/docs/templating/#schema): defaults fill absent values, optional variables without one render empty, names the schema does not declare are passed through. `global` is reserved: global variables come from the account.
-- `tls` (string): `required` or `verified`: deliver only over TLS (`verified`: with a valid certificate for the receiving server). Raises the domain's policy, never lowers it.
+- `tls` (string): `opportunistic`, `required` or `verified`: `required` delivers only over TLS, `verified` only with a valid certificate for the receiving server. The stricter of this and the domain’s policy applies: it raises the domain’s policy, never lowers it.
 
 ### Errors
 
@@ -353,6 +354,7 @@ With reply tracking on, the response carries `reply_to`: the tracked address the
 - `domain_not_verified` (HTTP 403): sender domain is not verified for this account
 - `restricted_api_key` (HTTP 403): key restricted to another domain or stream
 - `account_suspended` (HTTP 403): account is suspended
+- `account_closing` (HTTP 403): account is scheduled for deletion (an owner can cancel it in the dashboard)
 - `idempotency_key_reused` (HTTP 409)
 - `idempotency_request_in_progress` (HTTP 409)
 - `payload_too_large` (HTTP 413): request body exceeds 40MB
@@ -371,7 +373,7 @@ With reply tracking on, the response carries `reply_to`: the tracked address the
 - `service_unavailable` (HTTP 503): a backing store failing over ("a backing service is failing over; retry shortly", Retry-After: 2); MTA unreachable ("mail transfer agent temporarily unavailable, retry"), suppression list being rebuilt ("suppression list is being rebuilt, retry shortly"), or too many large request bodies in flight (Retry-After: 5)
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/emails' \
+curl -X POST 'https://app.zapsmtp.com/v1/emails' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -430,7 +432,7 @@ Only data inside the plan's log retention is visible. metadata may be null.
 - `not_found` (HTTP 404): email not found (events can take a few seconds to appear)
 
 ```bash
-curl 'https://api.zapsmtp.com/v1/emails/019a1f2e-7c3b-7d41-9a52-0c4b8e6f1a23' \
+curl 'https://app.zapsmtp.com/v1/emails/019a1f2e-7c3b-7d41-9a52-0c4b8e6f1a23' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -516,14 +518,14 @@ Use the last item's id as before= for the next page. metadata may be null when t
 
 ### Query parameters
 
-- `limit` (integer): 1-100; out-of-range values fall back to 20. Default `20`.
+- `limit` (integer): 1-100. Limits: 422 invalid_parameter otherwise. Default `20`.
 - `before` (string): Cursor: an email id (UUIDv7) or RFC 3339 time; returns emails accepted before it. An email id gives an exact page boundary. Limits: 422 invalid_parameter "before must be an email id or RFC 3339 time"
 - `after` (string): Email id or RFC 3339 time; only emails created after it (still newest first). Limits: 422 invalid_parameter "after must be an email id or RFC 3339 time"
-- `status` (string): Filter by latest status. status=scheduled lists pending scheduled sends instead (different item shape, ordered by scheduled time ascending, has_more always false, other filters/cursors ignored). One of `queued`, `delivered`, `delivery_delayed`, `bounced`, `complained`, `failed`, `opened`, `clicked`, `replied`, `suppressed`, `scheduled`.
+- `status` (string): Filter by latest status. status=scheduled lists pending scheduled sends instead (different item shape, ordered by scheduled time ascending, has_more always false, other filters/cursors ignored, though they must be valid). One of `queued`, `delivered`, `delivery_delayed`, `bounced`, `complained`, `failed`, `opened`, `clicked`, `replied`, `suppressed`, `scheduled`.
 - `q` (string): Case-insensitive substring of a recipient or subject, or an exact email id.
-- `days` (integer): Look-back window in days, 1-90 (other values ignored). Always capped by the plan's log retention. Default `30`.
+- `days` (integer): Look-back window in days, 1-90. Always capped by the plan's log retention. Limits: 422 invalid_parameter otherwise. Default `30`.
 - `stream` (string): One of `transactional`, `broadcast`.
-- `mode` (string): Filter live or test-mode (sandbox) traffic; other values ignored. One of `live`, `test`.
+- `mode` (string): Filter live or test-mode (sandbox) traffic. Limits: 422 invalid_parameter for other values. One of `live`, `test`.
 - `metadata[<key>]` (string): Exact match on a metadata value, e.g. metadata[order_id]=A-1042. Repeatable for several keys.
 
 ### Errors
@@ -532,7 +534,7 @@ Use the last item's id as before= for the next page. metadata may be null when t
 - `invalid_parameter` (HTTP 422): bad before/after
 
 ```bash
-curl 'https://api.zapsmtp.com/v1/emails?status=bounced&days=7&limit=50' \
+curl 'https://app.zapsmtp.com/v1/emails?status=bounced&days=7&limit=50' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -576,14 +578,14 @@ Use the last item's id as before= for the next page. metadata may be null when t
 
 ### Query parameters
 
-- `limit` (integer): 1-100; out-of-range values fall back to 20. Default `20`.
+- `limit` (integer): 1-100. Limits: 422 invalid_parameter otherwise. Default `20`.
 - `before` (string): Cursor: an email id (UUIDv7) or RFC 3339 time; returns emails accepted before it. An email id gives an exact page boundary. Limits: 422 invalid_parameter "before must be an email id or RFC 3339 time"
 - `after` (string): Email id or RFC 3339 time; only emails created after it (still newest first). Limits: 422 invalid_parameter "after must be an email id or RFC 3339 time"
-- `status` (string): Filter by latest status. status=scheduled lists pending scheduled sends instead (different item shape, ordered by scheduled time ascending, has_more always false, other filters/cursors ignored). One of `queued`, `delivered`, `delivery_delayed`, `bounced`, `complained`, `failed`, `opened`, `clicked`, `replied`, `suppressed`, `scheduled`.
+- `status` (string): Filter by latest status. status=scheduled lists pending scheduled sends instead (different item shape, ordered by scheduled time ascending, has_more always false, other filters/cursors ignored, though they must be valid). One of `queued`, `delivered`, `delivery_delayed`, `bounced`, `complained`, `failed`, `opened`, `clicked`, `replied`, `suppressed`, `scheduled`.
 - `q` (string): Case-insensitive substring of a recipient or subject, or an exact email id.
-- `days` (integer): Look-back window in days, 1-90 (other values ignored). Always capped by the plan's log retention. Default `30`.
+- `days` (integer): Look-back window in days, 1-90. Always capped by the plan's log retention. Limits: 422 invalid_parameter otherwise. Default `30`.
 - `stream` (string): One of `transactional`, `broadcast`.
-- `mode` (string): Filter live or test-mode (sandbox) traffic; other values ignored. One of `live`, `test`.
+- `mode` (string): Filter live or test-mode (sandbox) traffic. Limits: 422 invalid_parameter for other values. One of `live`, `test`.
 - `metadata[<key>]` (string): Exact match on a metadata value, e.g. metadata[order_id]=A-1042. Repeatable for several keys.
 
 ### Errors
@@ -592,7 +594,7 @@ Use the last item's id as before= for the next page. metadata may be null when t
 - `invalid_parameter` (HTTP 422): bad before/after
 
 ```bash
-curl 'https://api.zapsmtp.com/v1/emails?metadata%5Border_id%5D=A-1042' \
+curl 'https://app.zapsmtp.com/v1/emails?metadata%5Border_id%5D=A-1042' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -636,14 +638,14 @@ Use the last item's id as before= for the next page. metadata may be null when t
 
 ### Query parameters
 
-- `limit` (integer): 1-100; out-of-range values fall back to 20. Default `20`.
+- `limit` (integer): 1-100. Limits: 422 invalid_parameter otherwise. Default `20`.
 - `before` (string): Cursor: an email id (UUIDv7) or RFC 3339 time; returns emails accepted before it. An email id gives an exact page boundary. Limits: 422 invalid_parameter "before must be an email id or RFC 3339 time"
 - `after` (string): Email id or RFC 3339 time; only emails created after it (still newest first). Limits: 422 invalid_parameter "after must be an email id or RFC 3339 time"
-- `status` (string): Filter by latest status. status=scheduled lists pending scheduled sends instead (different item shape, ordered by scheduled time ascending, has_more always false, other filters/cursors ignored). One of `queued`, `delivered`, `delivery_delayed`, `bounced`, `complained`, `failed`, `opened`, `clicked`, `replied`, `suppressed`, `scheduled`.
+- `status` (string): Filter by latest status. status=scheduled lists pending scheduled sends instead (different item shape, ordered by scheduled time ascending, has_more always false, other filters/cursors ignored, though they must be valid). One of `queued`, `delivered`, `delivery_delayed`, `bounced`, `complained`, `failed`, `opened`, `clicked`, `replied`, `suppressed`, `scheduled`.
 - `q` (string): Case-insensitive substring of a recipient or subject, or an exact email id.
-- `days` (integer): Look-back window in days, 1-90 (other values ignored). Always capped by the plan's log retention. Default `30`.
+- `days` (integer): Look-back window in days, 1-90. Always capped by the plan's log retention. Limits: 422 invalid_parameter otherwise. Default `30`.
 - `stream` (string): One of `transactional`, `broadcast`.
-- `mode` (string): Filter live or test-mode (sandbox) traffic; other values ignored. One of `live`, `test`.
+- `mode` (string): Filter live or test-mode (sandbox) traffic. Limits: 422 invalid_parameter for other values. One of `live`, `test`.
 - `metadata[<key>]` (string): Exact match on a metadata value, e.g. metadata[order_id]=A-1042. Repeatable for several keys.
 
 ### Errors
@@ -652,7 +654,7 @@ Use the last item's id as before= for the next page. metadata may be null when t
 - `invalid_parameter` (HTTP 422): bad before/after
 
 ```bash
-curl 'https://api.zapsmtp.com/v1/emails?stream=broadcast&after=2026-10-20T00%3A00%3A00Z&before=2026-10-21T00%3A00%3A00Z&days=30&limit=100' \
+curl 'https://app.zapsmtp.com/v1/emails?stream=broadcast&after=2026-10-20T00%3A00%3A00Z&before=2026-10-21T00%3A00%3A00Z&days=30&limit=100' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -696,14 +698,14 @@ Use the last item's id as before= for the next page. metadata may be null when t
 
 ### Query parameters
 
-- `limit` (integer): 1-100; out-of-range values fall back to 20. Default `20`.
+- `limit` (integer): 1-100. Limits: 422 invalid_parameter otherwise. Default `20`.
 - `before` (string): Cursor: an email id (UUIDv7) or RFC 3339 time; returns emails accepted before it. An email id gives an exact page boundary. Limits: 422 invalid_parameter "before must be an email id or RFC 3339 time"
 - `after` (string): Email id or RFC 3339 time; only emails created after it (still newest first). Limits: 422 invalid_parameter "after must be an email id or RFC 3339 time"
-- `status` (string): Filter by latest status. status=scheduled lists pending scheduled sends instead (different item shape, ordered by scheduled time ascending, has_more always false, other filters/cursors ignored). One of `queued`, `delivered`, `delivery_delayed`, `bounced`, `complained`, `failed`, `opened`, `clicked`, `replied`, `suppressed`, `scheduled`.
+- `status` (string): Filter by latest status. status=scheduled lists pending scheduled sends instead (different item shape, ordered by scheduled time ascending, has_more always false, other filters/cursors ignored, though they must be valid). One of `queued`, `delivered`, `delivery_delayed`, `bounced`, `complained`, `failed`, `opened`, `clicked`, `replied`, `suppressed`, `scheduled`.
 - `q` (string): Case-insensitive substring of a recipient or subject, or an exact email id.
-- `days` (integer): Look-back window in days, 1-90 (other values ignored). Always capped by the plan's log retention. Default `30`.
+- `days` (integer): Look-back window in days, 1-90. Always capped by the plan's log retention. Limits: 422 invalid_parameter otherwise. Default `30`.
 - `stream` (string): One of `transactional`, `broadcast`.
-- `mode` (string): Filter live or test-mode (sandbox) traffic; other values ignored. One of `live`, `test`.
+- `mode` (string): Filter live or test-mode (sandbox) traffic. Limits: 422 invalid_parameter for other values. One of `live`, `test`.
 - `metadata[<key>]` (string): Exact match on a metadata value, e.g. metadata[order_id]=A-1042. Repeatable for several keys.
 
 ### Errors
@@ -712,7 +714,7 @@ Use the last item's id as before= for the next page. metadata may be null when t
 - `invalid_parameter` (HTTP 422): bad before/after
 
 ```bash
-curl 'https://api.zapsmtp.com/v1/emails?q=jane%40example.org&mode=live' \
+curl 'https://app.zapsmtp.com/v1/emails?q=jane%40example.org&mode=live' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -750,7 +752,7 @@ Node.js:
 
 ```javascript
 // Every bounced email of the last 7 days, page by page.
-const API = 'https://api.zapsmtp.com/v1';
+const API = 'https://app.zapsmtp.com/v1';
 const headers = { Authorization: `Bearer ${process.env.ZAP_API_KEY}` };
 
 const all = [];
@@ -773,7 +775,7 @@ Python:
 # Every bounced email of the last 7 days, page by page.
 import os, requests
 
-API = "https://api.zapsmtp.com/v1"
+API = "https://app.zapsmtp.com/v1"
 H = {"Authorization": f"Bearer {os.environ['ZAP_API_KEY']}"}
 
 emails, before = [], None
@@ -840,7 +842,7 @@ Totals and the series count each email once whatever the dimension; with `dimens
 
 - `from` (string): RFC 3339 start. At most 400 days before `to`. Default `7 days ago`.
 - `to` (string): RFC 3339 end (exclusive). Default `now`.
-- `granularity` (string): `hour` (ranges up to 31 days) or `day` for `series`. Default `hour up to 48 hours, else day`.
+- `granularity` (string): `hour` (ranges up to 31 days) or `day` for `series`. One of `hour`, `day`. Default `hour up to 48 hours, else day`.
 - `dimension` (string): `domain`, `stream`, `tag` or `provider`: adds `groups`, one row per value, busiest first.
 - `domain` (string): Only this sending (From) domain.
 - `stream` (string): `transactional` or `broadcast`.
@@ -853,7 +855,7 @@ Totals and the series count each email once whatever the dimension; with `dimens
 - `invalid_parameter` (HTTP 422): Bad time, range, granularity or dimension, or a tag combined with another filter.
 
 ```bash
-curl 'https://api.zapsmtp.com/v1/metrics?dimension=provider&from=2026-10-01T00%3A00%3A00Z&to=2026-10-26T00%3A00%3A00Z&granularity=day' \
+curl 'https://app.zapsmtp.com/v1/metrics?dimension=provider&from=2026-10-01T00%3A00%3A00Z&to=2026-10-26T00%3A00%3A00Z&granularity=day' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -966,7 +968,7 @@ Totals and the series count each email once whatever the dimension; with `dimens
 
 - `from` (string): RFC 3339 start. At most 400 days before `to`. Default `7 days ago`.
 - `to` (string): RFC 3339 end (exclusive). Default `now`.
-- `granularity` (string): `hour` (ranges up to 31 days) or `day` for `series`. Default `hour up to 48 hours, else day`.
+- `granularity` (string): `hour` (ranges up to 31 days) or `day` for `series`. One of `hour`, `day`. Default `hour up to 48 hours, else day`.
 - `dimension` (string): `domain`, `stream`, `tag` or `provider`: adds `groups`, one row per value, busiest first.
 - `domain` (string): Only this sending (From) domain.
 - `stream` (string): `transactional` or `broadcast`.
@@ -979,7 +981,7 @@ Totals and the series count each email once whatever the dimension; with `dimens
 - `invalid_parameter` (HTTP 422): Bad time, range, granularity or dimension, or a tag combined with another filter.
 
 ```bash
-curl 'https://api.zapsmtp.com/v1/metrics?tag=category%3Dinvoice&from=2026-10-19T00%3A00%3A00Z&to=2026-10-26T00%3A00%3A00Z' \
+curl 'https://app.zapsmtp.com/v1/metrics?tag=category%3Dinvoice&from=2026-10-19T00%3A00%3A00Z&to=2026-10-26T00%3A00%3A00Z' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -1092,7 +1094,7 @@ Totals and the series count each email once whatever the dimension; with `dimens
 
 - `from` (string): RFC 3339 start. At most 400 days before `to`. Default `7 days ago`.
 - `to` (string): RFC 3339 end (exclusive). Default `now`.
-- `granularity` (string): `hour` (ranges up to 31 days) or `day` for `series`. Default `hour up to 48 hours, else day`.
+- `granularity` (string): `hour` (ranges up to 31 days) or `day` for `series`. One of `hour`, `day`. Default `hour up to 48 hours, else day`.
 - `dimension` (string): `domain`, `stream`, `tag` or `provider`: adds `groups`, one row per value, busiest first.
 - `domain` (string): Only this sending (From) domain.
 - `stream` (string): `transactional` or `broadcast`.
@@ -1105,7 +1107,7 @@ Totals and the series count each email once whatever the dimension; with `dimens
 - `invalid_parameter` (HTTP 422): Bad time, range, granularity or dimension, or a tag combined with another filter.
 
 ```bash
-curl 'https://api.zapsmtp.com/v1/metrics?dimension=tag&from=2026-10-19T00%3A00%3A00Z&to=2026-10-26T00%3A00%3A00Z' \
+curl 'https://app.zapsmtp.com/v1/metrics?dimension=tag&from=2026-10-19T00%3A00%3A00Z&to=2026-10-26T00%3A00%3A00Z' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -1218,7 +1220,7 @@ Totals and the series count each email once whatever the dimension; with `dimens
 
 - `from` (string): RFC 3339 start. At most 400 days before `to`. Default `7 days ago`.
 - `to` (string): RFC 3339 end (exclusive). Default `now`.
-- `granularity` (string): `hour` (ranges up to 31 days) or `day` for `series`. Default `hour up to 48 hours, else day`.
+- `granularity` (string): `hour` (ranges up to 31 days) or `day` for `series`. One of `hour`, `day`. Default `hour up to 48 hours, else day`.
 - `dimension` (string): `domain`, `stream`, `tag` or `provider`: adds `groups`, one row per value, busiest first.
 - `domain` (string): Only this sending (From) domain.
 - `stream` (string): `transactional` or `broadcast`.
@@ -1231,7 +1233,7 @@ Totals and the series count each email once whatever the dimension; with `dimens
 - `invalid_parameter` (HTTP 422): Bad time, range, granularity or dimension, or a tag combined with another filter.
 
 ```bash
-curl 'https://api.zapsmtp.com/v1/metrics?domain=acme.com&dimension=stream&granularity=hour&from=2026-10-24T00%3A00%3A00Z&to=2026-10-26T00%3A00%3A00Z' \
+curl 'https://app.zapsmtp.com/v1/metrics?domain=acme.com&dimension=stream&granularity=hour&from=2026-10-24T00%3A00%3A00Z&to=2026-10-26T00%3A00%3A00Z' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -1344,14 +1346,15 @@ Counts events (not unique emails), ordered by status name; test-mode traffic exc
 
 ### Query parameters
 
-- `hours` (integer): 1-720; out-of-range falls back to 24. Default `24`.
+- `hours` (integer): 1-720. Limits: 422 invalid_parameter otherwise. Default `24`.
 
 ### Errors
 
 - `restricted_api_key` (HTTP 403)
+- `invalid_parameter` (HTTP 422): a query parameter is out of range or not one of its values
 
 ```bash
-curl 'https://api.zapsmtp.com/v1/stats?hours=24' \
+curl 'https://app.zapsmtp.com/v1/stats?hours=24' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -1389,14 +1392,15 @@ One point per (bucket, status); empty buckets are not emitted. Test-mode traffic
 
 ### Query parameters
 
-- `hours` (integer): 1-720; out-of-range falls back to 24. Bucket size: <=1h → 60 s, <=6h → 300 s, <=24h → 1800 s, <=168h → 10800 s, otherwise 43200 s. Default `24`.
+- `hours` (integer): 1-720 (422 invalid_parameter otherwise). Bucket size: <=1h → 60 s, <=6h → 300 s, <=24h → 1800 s, <=168h → 10800 s, otherwise 43200 s. Default `24`.
 
 ### Errors
 
 - `restricted_api_key` (HTTP 403)
+- `invalid_parameter` (HTTP 422): a query parameter is out of range or not one of its values
 
 ```bash
-curl 'https://api.zapsmtp.com/v1/stats/timeseries?hours=6' \
+curl 'https://app.zapsmtp.com/v1/stats/timeseries?hours=6' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -1434,14 +1438,15 @@ Providers are Gmail, Microsoft, Yahoo, Apple and Other. `delayed` counts emails 
 
 ### Query parameters
 
-- `hours` (integer): 1-720; out-of-range falls back to 24. Default `24`.
+- `hours` (integer): 1-720. Limits: 422 invalid_parameter otherwise. Default `24`.
 
 ### Errors
 
 - `restricted_api_key` (HTTP 403)
+- `invalid_parameter` (HTTP 422): a query parameter is out of range or not one of its values
 
 ```bash
-curl 'https://api.zapsmtp.com/v1/stats/breakdown?hours=168' \
+curl 'https://app.zapsmtp.com/v1/stats/breakdown?hours=168' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -1494,7 +1499,7 @@ curl 'https://api.zapsmtp.com/v1/stats/breakdown?hours=168' \
 
 ## Slice reports with tags and metadata
 
-Both are set when you send and both come back on every webhook, but they serve different questions:
+Both are set when you send and come back on delivery webhooks. On `email.opened` and `email.clicked` each is included only when it fits in 200 bytes (tags URL-encoded, metadata as JSON), so keep the identifiers you need there short; the email id always finds the full record. They serve different questions:
 
 **Tags vs metadata**
 
@@ -1505,7 +1510,7 @@ Keep tag values to a bounded set: a tag per user or per order creates one metric
 
 ## Webhooks: the real-time feed
 
-Polling tells you what happened; webhooks tell you as it happens. Every event in the lifecycle table is delivered to your endpoint per recipient, signed, retried on failure, with the email’s tags, metadata and stream. Use them to update your own records (mark an address invalid on `email.bounced`, stop a drip on `email.complained`, credit a campaign on `email.clicked`) and to feed your own warehouse. Payloads, retries and signature verification are in [Webhook events](https://zapsmtp.com/docs/webhook-events/).
+Polling tells you what happened; webhooks tell you as it happens. Every event in the lifecycle table is delivered to your endpoint per recipient, signed, retried on failure, with the email’s tags, metadata (on opens and clicks only when short, see above) and stream. Use them to update your own records (mark an address invalid on `email.bounced`, stop a drip on `email.complained`, credit a campaign on `email.clicked`) and to feed your own warehouse. Payloads, retries and signature verification are in [Webhook events](https://zapsmtp.com/docs/webhook-events/).
 
 ## Stream outcomes to your endpoint
 
@@ -1522,11 +1527,12 @@ To send clicks of one button to this endpoint: `{"events": ["email.clicked"], "f
 ### Body parameters
 
 - `url` (string, required): Absolute https:// URL. Limits: 422 invalid_parameter "url must be an absolute https:// URL"
-- `events` (string[]): Limits: unknown type → 422 invalid_parameter "unknown event type <x>; allowed: ..." One of `email.sent`, `email.delivered`, `email.delivery_delayed`, `email.bounced`, `email.complained`, `email.failed`, `email.opened`, `email.clicked`, `email.suppressed`, `email.received`, `thread.created`, `thread.replied`, `email.replied`. Default `all event types`.
+- `events` (string[]): Limits: unknown type → 422 invalid_parameter "unknown event type <x>; allowed: ..." One of `email.sent`, `email.delivered`, `email.delivery_delayed`, `email.bounced`, `email.complained`, `email.failed`, `email.opened`, `email.clicked`, `email.suppressed`, `email.received`, `thread.created`, `thread.replied`, `email.replied`, `email.opened_unique`, `email.clicked_unique`, `email.unsubscribed`, `email.forward_failed`, `domain.verified`, `domain.reputation_changed`, `email.scheduled`, `suppression.added`, `suppression.removed`, `domain.created`, `domain.deleted`. Default `every type except email.opened_unique and email.clicked_unique`.
 - `include_content` (boolean): `email.received` carries the message: text, html, headers, and download links (valid 24 hours) for the attachments and the raw .eml; text and html are cut at 1 MB in total (`truncated: true`). Default `false`.
 - `batch` (boolean): Send events up to 100 per request (or every second) as a JSON array, signed as one body; `Zap-Event-Id` is the batch id, each event keeps its own `id`. `email.received` with the full message still arrives alone. Default `false`.
-- `filter` (object): Narrows `email.clicked` to some [click actions](https://zapsmtp.com/docs/click-actions/); other event types are not affected. Empty or absent: every click. Default `{"actions": []}`.
+- `filter` (object): Narrows what the endpoint receives: `actions` narrows `email.clicked` (and `email.clicked_unique`) to some [click actions](https://zapsmtp.com/docs/click-actions/); `domains` narrows every event to some domains. Empty or absent: every click, every domain. Default `{"actions": [], "domains": []}`.
   - `actions` (string[]): Action names (lowercase letters, digits, `_`, `.` and `-`, starting with a letter or digit, up to 64 characters). The endpoint then receives `email.clicked` only for links with one of these actions. Limits: more than 50 → 422 invalid_parameter "filter.actions: at most 50"; a bad name → 422 invalid_parameter "filter.actions: <name> is not an action name"
+  - `domains` (string[]): Sending or receiving domains (lower case). The endpoint then receives only events of these domains: the From domain of sent email, the receiving domain of received mail, the domain of `domain.*` events. Limits: more than 50 → 422 invalid_parameter "filter.actions and filter.domains: at most 50 each"; a bad name → 422 invalid_parameter "filter.domains: <name> is not a domain name"
 
 ### Errors
 
@@ -1535,7 +1541,7 @@ To send clicks of one button to this endpoint: `{"events": ["email.clicked"], "f
 - `invalid_parameter` (HTTP 422)
 
 ```bash
-curl -X POST 'https://api.zapsmtp.com/v1/webhooks' \
+curl -X POST 'https://app.zapsmtp.com/v1/webhooks' \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -1568,7 +1574,8 @@ curl -X POST 'https://api.zapsmtp.com/v1/webhooks' \
   "include_content": false,
   "batch": false,
   "filter": {
-    "actions": []
+    "actions": [],
+    "domains": []
   }
 }
 ```
@@ -1636,7 +1643,7 @@ Node.js:
 // upserts them into Postgres, so late events correct earlier rows.
 import pg from 'pg';
 
-const API = 'https://api.zapsmtp.com/v1';
+const API = 'https://app.zapsmtp.com/v1';
 const headers = { Authorization: `Bearer ${process.env.ZAP_API_KEY}` };
 const iso = (d) => d.toISOString().replace('.000Z', 'Z');
 const LOOKBACK_DAYS = 3;
@@ -1677,7 +1684,7 @@ Python:
 # database works the same way), so late events correct earlier rows.
 import datetime as dt, os, sqlite3, requests
 
-API = "https://api.zapsmtp.com/v1"
+API = "https://app.zapsmtp.com/v1"
 H = {"Authorization": f"Bearer {os.environ['ZAP_API_KEY']}"}
 fmt = lambda t: t.strftime("%Y-%m-%dT%H:%M:%SZ")
 LOOKBACK_DAYS = 3
@@ -1718,7 +1725,7 @@ Node.js:
 ```javascript
 // Run every hour. Alerts when a sending domain's bounce or complaint
 // rate over the last 24 hours crosses a threshold.
-const API = 'https://api.zapsmtp.com/v1';
+const API = 'https://app.zapsmtp.com/v1';
 const headers = { Authorization: `Bearer ${process.env.ZAP_API_KEY}` };
 const MIN_SENT = 200;        // ignore tiny samples
 const MAX_BOUNCE = 0.02;     // 2% of sent
@@ -1756,7 +1763,7 @@ Python:
 # rate over the last 24 hours crosses a threshold.
 import datetime as dt, os, requests
 
-API = "https://api.zapsmtp.com/v1"
+API = "https://app.zapsmtp.com/v1"
 H = {"Authorization": f"Bearer {os.environ['ZAP_API_KEY']}"}
 MIN_SENT, MAX_BOUNCE, MAX_COMPLAINT = 200, 0.02, 0.001
 
@@ -1801,7 +1808,7 @@ Requests made with API keys are logged; the dashboard’s own calls are not. The
 
 ### Query parameters
 
-- `limit` (integer): 1–100. Default `20`.
+- `limit` (integer): 1–100. Limits: 422 invalid_parameter otherwise. Default `20`.
 - `before` (string): A log id: return older entries.
 - `after` (string): A log id: return newer entries.
 - `status` (string): An exact status (`422`) or a class: `2xx`, `4xx`, `5xx`.
@@ -1814,7 +1821,7 @@ Requests made with API keys are logged; the dashboard’s own calls are not. The
 - `invalid_parameter` (HTTP 422): before or after is not a log id.
 
 ```bash
-curl 'https://api.zapsmtp.com/v1/logs?status=422&method=POST&path=%2Fv1%2Femails&limit=20' \
+curl 'https://app.zapsmtp.com/v1/logs?status=422&method=POST&path=%2Fv1%2Femails&limit=20' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 
@@ -1857,7 +1864,7 @@ Requires a full-access key.
 `limit` is `null` on paid plans without a spending cap: email keeps flowing and extra volume is billed. The Free plan adds `daily_limit` and `sent_today`.
 
 ```bash
-curl 'https://api.zapsmtp.com/v1/usage' \
+curl 'https://app.zapsmtp.com/v1/usage' \
   -H "Authorization: Bearer $ZAP_API_KEY"
 ```
 

@@ -28,6 +28,14 @@ The visual editor: blocks on the left, settings for the selected button on the r
 
 Variables are written as `{{name}}` and highlighted in the email. The editor keeps an undo history, saves a backup in your browser while you work, and keeps the last 50 saved versions, any of which you can preview and restore. *Preview* shows the email on desktop, on a phone, in dark mode and as plain text; *Test* sends it to your inbox; *Spam check* scores it with SpamAssassin and rspamd.
 
+## Images, modules and timers
+
+**Images.** The image picker uploads a file, reuses one from your account’s library, takes an external URL, or copies an external image to ZapSMTP hosting. PNG, JPEG, GIF and WebP up to 5 MB each; PNG and JPEG wider than 1,200 pixels are scaled down. The library holds up to 2,000 images and 1 GB. Deleting an image removes the file, so emails and templates that still show it lose it.
+
+**Modules.** *Save as module* keeps a row (a header, a footer, a product card) to insert into any template from the Modules tab. An inserted module is a copy: editing or deleting the saved module leaves templates that use it unchanged.
+
+**Countdown timers.** A countdown block is an animated GIF drawn when the email is opened, counting down to your deadline. It runs once for up to 60 seconds and then holds its last frame; it is not a live clock. After the deadline it shows zero.
+
 ## Writing HTML
 
 Prefer your own HTML? The code editor highlights HTML and variables, completes variable names as you type `{{`, and marks a template error on its line. The preview on the right renders with your sample variables as you type. The plain-text part is one click away: *Generate from HTML*.
@@ -47,7 +55,7 @@ Prefer your own HTML? The code editor highlights HTML and variables, completes v
 Pass the template's id or alias and its variables instead of a subject and HTML. The subject, the HTML and the plain text are all rendered from the published version; a missing variable is an error, so a half-filled email never goes out.
 
 ```
-curl -X POST https://api.zapsmtp.com/v1/emails \
+curl -X POST https://app.zapsmtp.com/v1/emails \
   -H "Authorization: Bearer $ZAP_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{

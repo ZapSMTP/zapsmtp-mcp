@@ -107,8 +107,8 @@
  {
   "uri": "https://zapsmtp.com/docs/logs.md",
   "name": "logs",
-  "title": "Logs & usage API",
-  "description": "Every API request with its bodies, and this month’s usage against your plan.",
+  "title": "Logs, usage & account API",
+  "description": "Every API request with its bodies, this month’s usage against your plan, and the account itself.",
   "file": "logs.md"
  },
  {
@@ -117,6 +117,13 @@
   "title": "Migrating to ZapSMTP",
   "description": "Move from Resend, SendGrid, Mailgun, Postmark or Amazon SES: field and event mappings, templates, webhooks, suppressions, DNS and a safe rollout.",
   "file": "migration.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/placement.md",
+  "name": "placement",
+  "title": "Inbox placement API",
+  "description": "See whether a message lands in the inbox, a Gmail tab or spam at Gmail, Outlook, Yahoo and others.",
+  "file": "placement.md"
  },
  {
   "uri": "https://zapsmtp.com/docs/platform.md",
@@ -215,6 +222,13 @@
   "title": "Testing and simulator",
   "description": "Test every delivery path with ZapSMTP test keys and simulator addresses: bounces, complaints, delays and exact SMTP replies.",
   "file": "testing.md"
+ },
+ {
+  "uri": "https://zapsmtp.com/docs/validation.md",
+  "name": "validation",
+  "title": "Email validation API",
+  "description": "Check addresses before you send: domain, mail servers, throw-away and role addresses, typos and earlier bounces.",
+  "file": "validation.md"
  },
  {
   "uri": "https://zapsmtp.com/docs/variables.md",

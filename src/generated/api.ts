@@ -5452,6 +5452,247 @@ export const API: Api = {
    },
    "paging": null,
    "idempotent": false
+  },
+  {
+   "id": "validate-email",
+   "title": "Validate an address",
+   "summary": "Check one address before you send to it: syntax, the domain and its mail servers, throw-away and role addresses, typos, your suppression list and earlier hard bounces.",
+   "doc": "Check one address before you send to it: syntax, the domain and its mail servers, throw-away and role addresses, typos, your suppression list and earlier hard bounces. Any API key; test keys too (nothing is sent or changed). result: deliverable (every check passed), risky (it may arrive, but sending to it can hurt your reputation), undeliverable (it will bounce) or unknown (the domain's DNS did not answer: try again later). reason is the most serious of reasons: invalid_syntax, reserved_domain, domain_not_found, no_mail_server, mailbox_not_found, previously_bounced (hard bounced on ZapSMTP in the last 180 days), dns_error, suppressed (on your suppression list), disposable, accept_all, role_address; ok when there is none. checks.mailbox is exists, not_found, unknown or not_checked. Nothing is ever sent to the address. did_you_mean suggests a likely intended address when the domain looks like a typo. Each address counts against your plan's monthly validations (Free 100, Pro 5,000, Scale 25,000); over it: 429 monthly_quota_exceeded. Results are not stored.",
+   "httpMethod": "POST",
+   "path": "/email-validations",
+   "resource": [
+    "emailValidations"
+   ],
+   "method": "create",
+   "pathParams": [],
+   "query": [],
+   "body": [
+    {
+     "name": "email",
+     "type": {
+      "k": "string"
+     },
+     "required": true,
+     "doc": "The address to check."
+    }
+   ],
+   "options": [],
+   "bodyArray": null,
+   "hasParams": true,
+   "returns": {
+    "model": "EmailValidation",
+    "page": false
+   },
+   "paging": null,
+   "idempotent": false
+  },
+  {
+   "id": "validate-emails",
+   "title": "Validate up to 100 addresses",
+   "summary": "Check up to 100 addresses in one call; results come back in the order given.",
+   "doc": "Check up to 100 addresses in one call; results come back in the order given. Any API key; test keys too (nothing is sent or changed). Each address counts against the plan's monthly validations; a batch that would pass the allowance is refused whole.",
+   "httpMethod": "POST",
+   "path": "/email-validations/batch",
+   "resource": [
+    "emailValidations"
+   ],
+   "method": "createBatch",
+   "pathParams": [],
+   "query": [],
+   "body": [
+    {
+     "name": "emails",
+     "type": {
+      "k": "array",
+      "of": {
+       "k": "string"
+      }
+     },
+     "required": true,
+     "doc": "1–100 addresses, each at most 320 characters."
+    }
+   ],
+   "options": [],
+   "bodyArray": null,
+   "hasParams": true,
+   "returns": {
+    "model": "EmailValidationList",
+    "page": false
+   },
+   "paging": null,
+   "idempotent": false
+  },
+  {
+   "id": "create-placement-test",
+   "title": "Start a placement test",
+   "summary": "Start an inbox placement test: see whether a message lands in the inbox, a Gmail tab or spam at the big mailbox providers.",
+   "doc": "Start an inbox placement test: see whether a message lands in the inbox, a Gmail tab or spam at the big mailbox providers. Requires a full-access live key; test keys get 403 test_key_restricted. With a message (from and content, or a template) one copy goes to each seed mailbox through your account, like any send (each counts as a sent email; test keys cannot). Without one the test is manual: send your message to every address in results from anywhere, with token in the subject or text, within 2 hours. ZapSMTP then reads each seed mailbox (Gmail, Outlook, Yahoo and others) and records where the copy landed: inbox, a Gmail tab (promotions, social, updates, forums), spam, or missing once the test ends (15 minutes after a send). auth is the provider's own SPF, DKIM and DMARC verdict. status is running until every seed has an answer or the test ends, then done. summary.inbox_rate = inbox (any tab) / seeds with an answer. Your plan includes a number of tests a month (Free 1, Pro 10, Scale 50); over it: 429 monthly_quota_exceeded.",
+   "httpMethod": "POST",
+   "path": "/placement-tests",
+   "resource": [
+    "placementTests"
+   ],
+   "method": "create",
+   "pathParams": [],
+   "query": [],
+   "body": [
+    {
+     "name": "from",
+     "type": {
+      "k": "string"
+     },
+     "required": false,
+     "doc": "Sender on one of your verified domains. Leave out (with template) for a manual test."
+    },
+    {
+     "name": "subject",
+     "type": {
+      "k": "string"
+     },
+     "required": false,
+     "doc": "As in Send an email."
+    },
+    {
+     "name": "html",
+     "type": {
+      "k": "string"
+     },
+     "required": false,
+     "doc": "As in Send an email."
+    },
+    {
+     "name": "text",
+     "type": {
+      "k": "string"
+     },
+     "required": false,
+     "doc": "As in Send an email."
+    },
+    {
+     "name": "template",
+     "type": {
+      "k": "ref",
+      "ref": "TemplateRef"
+     },
+     "required": false,
+     "doc": "A stored template and its variables, as in Send an email."
+    },
+    {
+     "name": "headers",
+     "type": {
+      "k": "map",
+      "of": {
+       "k": "string"
+      }
+     },
+     "required": false,
+     "doc": "Extra headers, as in Send an email."
+    },
+    {
+     "name": "tags",
+     "type": {
+      "k": "array",
+      "of": {
+       "k": "ref",
+       "ref": "Tag"
+      }
+     },
+     "required": false,
+     "doc": "As in Send an email."
+    },
+    {
+     "name": "stream",
+     "type": {
+      "k": "string"
+     },
+     "required": false,
+     "doc": "As in Send an email."
+    }
+   ],
+   "options": [],
+   "bodyArray": null,
+   "hasParams": true,
+   "returns": {
+    "model": "PlacementTest",
+    "page": false
+   },
+   "paging": null,
+   "idempotent": false
+  },
+  {
+   "id": "get-placement-test",
+   "title": "Retrieve a placement test",
+   "summary": "Retrieve a placement test with where each copy landed.",
+   "doc": "Retrieve a placement test with where each copy landed. Requires a full-access key. ZapSMTP then reads each seed mailbox (Gmail, Outlook, Yahoo and others) and records where the copy landed: inbox, a Gmail tab (promotions, social, updates, forums), spam, or missing once the test ends (15 minutes after a send). auth is the provider's own SPF, DKIM and DMARC verdict. status is running until every seed has an answer or the test ends, then done. summary.inbox_rate = inbox (any tab) / seeds with an answer.",
+   "httpMethod": "GET",
+   "path": "/placement-tests/{id}",
+   "resource": [
+    "placementTests"
+   ],
+   "method": "get",
+   "pathParams": [
+    {
+     "name": "id",
+     "type": {
+      "k": "string"
+     },
+     "required": true,
+     "doc": "The test id."
+    }
+   ],
+   "query": [],
+   "body": [],
+   "options": [],
+   "bodyArray": null,
+   "hasParams": false,
+   "returns": {
+    "model": "PlacementTest",
+    "page": false
+   },
+   "paging": null,
+   "idempotent": false
+  },
+  {
+   "id": "list-placement-tests",
+   "title": "List placement tests",
+   "summary": "List placement tests, newest first, with cursor pagination.",
+   "doc": "List placement tests, newest first, with cursor pagination. Requires a full-access key. Pass next_cursor as after for the next page.",
+   "httpMethod": "GET",
+   "path": "/placement-tests",
+   "resource": [
+    "placementTests"
+   ],
+   "method": "list",
+   "pathParams": [],
+   "query": [
+    {
+     "name": "limit",
+     "type": {
+      "k": "integer"
+     },
+     "required": false,
+     "doc": "1-100. Limits: 422 invalid_parameter otherwise.",
+     "default": "20"
+    },
+    {
+     "name": "after",
+     "type": {
+      "k": "string"
+     },
+     "required": false,
+     "doc": "A test id from next_cursor. Limits: 422 invalid_parameter otherwise."
+    }
+   ],
+   "body": [],
+   "options": [],
+   "bodyArray": null,
+   "hasParams": true,
+   "returns": {
+    "model": "PlacementTest",
+    "page": true
+   },
+   "paging": "cursor",
+   "idempotent": false
   }
  ],
  "inputs": {
